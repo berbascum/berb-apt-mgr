@@ -1,0 +1,14 @@
+berb-apt-mgr (1.0.0.1+git20240614094454.a5a1431.testing) testing; urgency=medium
+
+  [berbascum]
+  * (a5a1431) Fix package description in debian/control 
+  * (b096f6e) Update pkg_rootfs packaging dir 
+  * (6204251) Update: doc README.md 
+  * (e67c7b3) Add .gitignore 
+  * (6b78f38) Add pkg_rootfs packaging dir 
+  * (e8bd3d6) Rename the main script 
+  * (5f44fee) Move config files to conf_templates dir 
+  * (2db43f3) Add debian packaging 
+  * (3c38139) Update README.md with initial help 
+
+ -- berbascum <berbascum@ticv.cat>  Fri, 14 Jun 2024 09:44:54 +0200
