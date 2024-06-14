@@ -24,14 +24,7 @@ ASK() { echo; read -p "$*" answer; }
 info() { echo; echo  "INFO:  $*"; }
 abort() { echo; echo "ABORT: $*"; exit; }
 
-## Config file
-[ ! -f "apt-repo.conf" ] &&  abort "apt-repo.conf not found!"
-
-## Load config file
-while read var; do
-    eval ${var}
-done < "apt-repo.conf"
-
+## Help
 fn_help() {
     echo; echo "Script to rebuild an apt repo"
     echo "- This script can be runned from any dir if it's in PATH"
@@ -43,6 +36,16 @@ fn_help() {
     echo
 }
 [ -n "$(echo "$@" | grep "\-\-help")" ] && fn_help && exit 0
+
+## Config file
+[ ! -f "apt-repo.conf" ] &&  abort "apt-repo.conf not found!"
+
+## Load config file
+while read var; do
+    eval ${var}
+done < "apt-repo.conf"
+
+
 
 
 fn_mkdirs() {
