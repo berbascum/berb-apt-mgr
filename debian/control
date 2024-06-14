@@ -15,4 +15,4 @@ Depends: ${misc:Depends},
          apt-utils,
          dpkg-dev,
          gnupg,
-Description: Bash script to manage docker containers with multiple plugins
+Description: Bash script to manage a local apt repo
