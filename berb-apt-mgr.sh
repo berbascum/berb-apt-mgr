@@ -125,46 +125,39 @@ fn_apt_repo_configs_create() {
     ## Check for apt-ftp config templates
     fn_check_templates
     ## Create aptftp config file from the template
-    cp -v "${aptftp_Default_templ_fullpath_filename}" "${apt_ftp_config_dirname}/${aptftp_conf_filename}"
+    cp -v "${aptftp_Default_templ_fullpath_filename}" \
+	"${apt_ftp_config_dirname}/${aptftp_conf_filename}"
     #
     ## Create aptgenerate config files from the template for each release and arch
     for release in ${arr_releases[@]}; do
+	fragment_rel_filename="aptftp-Release-${release}.fragment"
         cp -v "${aptftp_Release_templ_fullpath_filename}" \
-	    "${apt_ftp_config_dirname}/fragments/aptftp-conf-release-${release}.fragment"
+	    "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}"
         sed -i "s/REPLACE_RELEASE/${release}/g" \
-	    "${apt_ftp_config_dirname}/fragments/aptftp-conf-release-${release}.fragment"
+	    "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}"
         sed -i "s/REPLACE_ORIGIN/${releases_origin}/g" \
-	    "${apt_ftp_config_dirname}/fragments/aptftp-conf-release-${release}.fragment"
+	    "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}"
         sed -i "s/REPLACE_LABEL/${releases_label}/g" \
-	    "${apt_ftp_config_dirname}/fragments/aptftp-conf-release-${release}.fragment"
+	    "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}"
         sed -i "s/REPLACE_DESCRIPTION/${releases_description}/g" \
-	    "${apt_ftp_config_dirname}/fragments/aptftp-conf-release-${release}.fragment"
+	    "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}"
         sed -i "s/replace_archs_list/${architectures_archs_list}/g" \
-	    "${apt_ftp_config_dirname}/fragments/aptftp-conf-release-${release}.fragment"
+	    "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}"
+        cat "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}" \
+	    >> "${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
+        for arch in ${arr_archs[@]}; do
+	    fragment_dir_filename="aptftp-Directorys-${release}-${arch}.fragment"
+            cp -v "${aptftp_Directorys_templ_fullpath_filename}" \
+	        "${apt_ftp_config_dirname}/fragments/${fragment_dir_filename}"
+            sed -i "s/REPLACE_RELEASE/${release}/g" \
+	        "${apt_ftp_config_dirname}/fragments/${fragment_dir_filename}"
+            sed -i "s/REPLACE_ARCH/${arch}/g" \
+	        "${apt_ftp_config_dirname}/fragments/${fragment_dir_filename}"
+            cat "${apt_ftp_config_dirname}/fragments/${fragment_dir_filename}" \
+	        >> "${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
+	done
     done
     exit
-    for release in ${arr_releases[@]}; do
-        for arch in ${arr_archs[@]}; do
-            conf_fragment=$(echo "${aptgenerate_conf_filename_noext}-${release}-${arch}.conf")
-            cp -v "${aptgenerate_conf_templ_fullpath_filename}" \
-	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
-            sed -i "s/REPLACE_ARCH/${arch}/g" \
-	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
-            sed -i "s/REPLACE_RELEASE/${release}/g" \
-	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
-            sed -i "s/REPLACE_ORIGIN/${releases_origin}/g" \
-	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
-            sed -i "s/REPLACE_LABEL/${releases_label}/g" \
-	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
-            sed -i "s/REPLACE_DESCRIPTION/${releases_description}/g" \
-	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
-            sed -i "s/replace_archs_list/${architectures_archs_list}/g" \
-	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
-	    cat "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}" \
-		>> "${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
-	    echo "" >> "${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
-        done
-    done
 }
 [ -n "$(echo "$@" | grep "\-\-createconf")" ] && fn_apt_repo_configs_create && exit 0
 
