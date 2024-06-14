@@ -40,7 +40,13 @@ fn_help() {
 
 ## Config file
 [ ! -f "berb-apt-mgr.conf" ] &&  abort "berb-apt-mgr.conf not found!"
+[ ! -f "/etc/berb-apt-mgr/berb-apt-mgr-main.conf" ] \
+    &&  abort "/etc/berb-apt-mgr/berb-apt-mgr-main.conf not found!"
 
+## Load main config file
+while read var; do
+    eval ${var}
+done < "/etc/berb-apt-mgr/berb-apt-mgr-main.conf"
 ## Load config file
 while read var; do
     eval ${var}
@@ -49,13 +55,15 @@ done < "berb-apt-mgr.conf"
 fn_mkdirs() {
     info "Creating directory structure..."
     ## Create pool dirs
-    for base_dir in ${arr_base_dirs[@]}; do
-        for release in ${arr_releases[@]}; do
+    for release in ${arr_releases[@]}; do
+        mkdir -p -v "dists/${release}/main/source"
+        for base_dir in ${arr_base_dirs[@]}; do
             for arch in ${arr_archs[@]}; do
                 mkdir -p -v "${base_dir}/${release}/main/binary-${arch}"
             done
          done
     done
+    mkdir -v state cache
 }
 [ -n "$(echo "$@" | grep "\-\-mkdirs")" ] && fn_mkdirs && exit 0
 
@@ -117,11 +125,11 @@ fn_apt_repo_configs_create() {
     ## Check for apt-ftp config templates
     fn_check_templates
     ## Create aptftp config file from the template
-    cp -v "${aptftp_conf_templ_fullpath_filename}" "${apt_ftp_config_dirname}/${aptftp_conf_filename}"
+    cp -v "${aptftp_Default_templ_fullpath_filename}" "${apt_ftp_config_dirname}/${aptftp_conf_filename}"
     #
     ## Create aptgenerate config files from the template for each release and arch
     for release in ${arr_releases[@]}; do
-        cp -v "${aptftp_conf_release_templ_fullpath_filename}" \
+        cp -v "${aptftp_Release_templ_fullpath_filename}" \
 	    "${apt_ftp_config_dirname}/fragments/aptftp-conf-release-${release}.fragment"
         sed -i "s/REPLACE_RELEASE/${release}/g" \
 	    "${apt_ftp_config_dirname}/fragments/aptftp-conf-release-${release}.fragment"
