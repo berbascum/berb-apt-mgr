@@ -36,8 +36,8 @@ fn_help() {
     echo; echo "Script to rebuild an apt repo"
     echo "- This script can be runned from any dir if it's in PATH"
     echo "- Change to the apt repo dir is needed first"
-    echo "- The files \"key-ids.conf\" and \"apt-repo.conf\" need to be"
-    echo "  configured and moved to the apt repo rootdir"
+    echo "- The files \"key-ids.conf\" and \"apt-repo.conf\" in /usr/share/berb-apt-mgr"
+    echo "  need to be configured and moved to the apt repo rootdir"
     echo "- To create the initial dir structure, run the script with --mkdirs arg"
     echo "- To rebuild repo, run the script with --rebuild tag"
     echo
