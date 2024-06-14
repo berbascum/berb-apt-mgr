@@ -45,14 +45,16 @@ while read var; do
     eval ${var}
 done < "apt-repo.conf"
 
-
-
-
 fn_mkdirs() {
     info "Creating directory structure..."
-    mkdir -p pool/main
-    for arch in ${arr_archs[@]}; do
-        mkdir -p dists/"${suite}"/main/binary-"${arch}"
+    arr_base_dirs=( "pool" "dists" )
+    ## Create pool dirs
+    for base_dir in ${arr_base_dirs[@]}; do
+        for release in ${arr_releases[@]}; do
+            for arch in ${arr_archs[@]}; do
+                mkdir -p -v "${base_dir}/${release}/main/binary-${arch}"
+            done
+         done
     done
 }
 [ -n "$(echo "$@" | grep "\-\-mkdirs")" ] && fn_mkdirs && exit 0
