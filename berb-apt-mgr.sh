@@ -83,12 +83,13 @@ fn_check_templates() {
 
 fn_apt_repo_configs_create() {
     ## Check for apt-ftc config s dir
-    if [ -d "${apt_ftp_config_dirname}" ]; then
-	ASK "\"${apt_ftp_config_dirname}\" dir already exist. Want to reset? [ y|n ]: "
-        [ "${answer}" != "y" ] && abort "Aborted by user"
-	rm "${apt_ftp_config_dirname}"/* 2>/dev/null
+    ASK "Any previous aptftp and aptgenerate conf files will be removed. Are you sure? [ y|n ]: "
+    [ "${answer}" != "y" ] && abort "Aborted by user"
+    if [ -d "${apt_ftp_config_dirname}/fragments" ]; then
+	rm "${apt_ftp_config_dirname}"/*.conf 2>/dev/null
+	rm "${apt_ftp_config_dirname}"/fragments/*.conf 2>/dev/null
     else
-        mkdir "${apt_ftp_config_dirname}"
+        mkdir -p -v "${apt_ftp_config_dirname}"/fragments
     fi
     ## Set needed vars
     architectures_archs_list=""
@@ -111,39 +112,28 @@ fn_apt_repo_configs_create() {
     ## Check for apt-ftp config templates
     fn_check_templates
     ## Create aptftp config file from the template
-    aptftp_conf_filename=$(echo $(basename $(echo "${aptftp_conf_templ}" \
-        | sed 's/_template//g' | awk -F'.' '{print $1}'))".conf")
-    cp -v "${aptftp_conf_templ}" "${apt_ftp_config_dirname}/${aptftp_conf_filename}"
+    cp -v "${aptftp_conf_templ_fullpath_filename}" "${apt_ftp_config_dirname}/${aptftp_conf_filename}"
+    aptgenerate_conf_filename_noext=$(echo "${aptgenerate_conf_filename}" | awk -F'.' '{print $1}')
     ## Create aptgenerate config files from the template for each release and arch
     for release in ${arr_releases[@]}; do
         for arch in ${arr_archs[@]}; do
-            aptgenerate_conf_filename=$(echo $(basename $(echo "${aptgenerate_conf_templ}" \
-	        | sed 's/_template//g' | awk -F'.' '{print $1}'))"-${release}-${arch}.conf")
-            cp -v "${aptgenerate_conf_templ}" "${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
+            aptgenerate_conf_fragment=$(echo "${aptgenerate_conf_filename_noext}-${release}-${arch}.conf")
+            cp -v "${aptgenerate_conf_templ_fullpath_filename}" \
+	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
             sed -i "s/REPLACE_ARCH/${arch}/g" \
-		"${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
+	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
             sed -i "s/REPLACE_RELEASE/${release}/g" \
-		"${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
+	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
             sed -i "s/REPLACE_ORIGIN/${releases_origin}/g" \
-		"${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
+	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
             sed -i "s/REPLACE_LABEL/${releases_label}/g" \
-		"${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
+	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
             sed -i "s/REPLACE_DESCRIPTION/${releases_description}/g" \
-		"${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
+	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
             sed -i "s/replace_archs_list/${architectures_archs_list}/g" \
-		"${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
+	        "${apt_ftp_config_dirname}/fragments/${aptgenerate_conf_fragment}"
         done
     done
-exit
-    echo "aptftp_conf_filename=${aptftp_conf_filename}"
-    echo "aptgenerate_conf_filename=${aptgenerate_conf_filename}"
-    exit
-
-
-    sed -i "s/RELEASE/${release}/g" ./aptftp-${release}-${arch}.conf
-    cp "${aptgenerate_conf_templ}" ./aptgenerate-${release}-${arch}.conf
-    sed -i "s/ARCH/${arch}/g" ./aptgenerate-${release}-${arch}.conf
-    sed -i "s/RELEASE/${release}/g" ./aptgenerate-${release}-${arch}.conf
 }
 [ -n "$(echo "$@" | grep "\-\-createconf")" ] && fn_apt_repo_configs_create && exit 0
 
