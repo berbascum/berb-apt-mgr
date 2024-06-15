@@ -27,16 +27,28 @@ error() { echo; echo "ABORT: $*"; exit; }
 
 ## Help
 fn_help() {
-    echo; echo "Script to rebuild an apt repo"
-    echo "- This script can be runned from any dir if it's in PATH"
-    echo "- Change to the apt repo dir is needed first"
-    echo "- The files \"key-ids.conf\" and \"berb-apt-mgr.conf\" in /usr/share/berb-apt-mgr"
+    echo; echo "Simple script to manage a multiarch and multirelease apt repository"
+    echo
+    echo "* This script can be runned from any dir if it's in PATH"
+    echo
+    echo "* Change to the apt repo dir is needed first"
+    echo
+    echo "* The files \"key-ids.conf\" and \"berb-apt-mgr.conf\" in /usr/share/berb-apt-mgr"
     echo "  need to be configured and moved to the apt repo rootdir"
-    echo "- To create the initial dir structure, run the script with --mkdirs arg"
-    echo "- To rebuild repo, run the script with --rebuild tag"
+    echo
+    echo "* script tags:"
+    echo
+    echo "  --mkdirs:     Creates the repo dir structure, based on the releases and archs"
+    echo "                configured in the berb-apt-mgr.conf file"
+    echo
+    echo "  --rebuild:    Rebuilds the repo"
+    echo
+    echo "  --createconf: Generates the aptftp.conf and aptgenerate.conf files from"
+    echo "                temples using the releases and archs configured in the"
+    echo "                berb-apt-mgr.conf file"
     echo
 }
-[ -n "$(echo "$@" | grep "\-\-help")" ] && fn_help && exit 0
+[ -z "$1" -o -n "$(echo "$@" | grep "\-\-help")" ] && fn_help && exit 0
 
 ## Config file
 [ ! -f "berb-apt-mgr.conf" ] &&  abort "berb-apt-mgr.conf not found!"
