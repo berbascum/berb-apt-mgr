@@ -79,21 +79,6 @@ fn_mkdirs() {
 }
 [ -n "$(echo "$@" | grep "\-\-mkdirs")" ] && fn_mkdirs && exit 0
 
-fn_gen_Packages() {
-    ## First copy the debs to pool/<release>/main
-    #
-    ## Remove the packages files in the repo rootdirn
-    [ -f "packages-"${arch}".db" ] && rm -f packages-"${arch}".db
-    ## Gen Packages files for each arch and release
-    for release in ${arr_releases[@]}; do
-        for arch in ${arr_archs[@]}; do
-	    dpkg-scanpackages --multiversion pool/ \
-	        > dists/"${release}"/main/binary-"${arch}"/Packages
-            cat dists/${release}/main/binary-"${arch}"/Packages | gzip -9 \
-	        > dists/${release}/main/binary-"${arch}"/Packages.gz
-	done
-    done
-}
 
 fn_check_templates() {
     for template in ${arr_aptconf_templates[@]}; do
@@ -122,7 +107,10 @@ fn_get_arch_lists() {
 }
 
 fn_apt_repo_configs_create() {
-    ## Check for apt-ftc config s dir
+    ## Ask for dirs creation
+    ASK "Want to call the --mkdirs flag? [ y|n ]: "
+    [ "${answer}" == "y" ] && fn_mkdirs
+    ## Check for apt-ftp config s dir
     ASK "Any previous aptftp and aptgenerate conf files will be removed. Are you sure? [ y|n ]: "
     [ "${answer}" != "y" ] && abort "Aborted by user"
     if [ -d "${apt_ftp_config_dirname}/fragments" ]; then
@@ -178,6 +166,22 @@ fn_apt_repo_configs_create() {
     done
 }
 [ -n "$(echo "$@" | grep "\-\-createconf")" ] && fn_apt_repo_configs_create && exit 0
+
+fn_gen_Packages() {
+    ## First copy the debs to pool/<release>/main
+    #
+    ## Remove the packages files in the repo rootdirn
+    [ -f "packages-"${arch}".db" ] && rm -f packages-"${arch}".db
+    ## Gen Packages files for each arch and release
+    for release in ${arr_releases[@]}; do
+        for arch in ${arr_archs[@]}; do
+	    dpkg-scanpackages --multiversion pool/ \
+	        > dists/"${release}"/main/binary-"${arch}"/Packages
+            cat dists/${release}/main/binary-"${arch}"/Packages | gzip -9 \
+	        > dists/${release}/main/binary-"${arch}"/Packages.gz
+	done
+    done
+}
 
 fn_gen_Release() {
     for release in ${arr_releases[@]}; do
