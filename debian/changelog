@@ -1,6 +1,33 @@
-berb-apt-mgr (1.0.0.1+git20240614094454.a5a1431.testing) testing; urgency=medium
+berb-apt-mgr (2.0.0.1+git20240615141422.abc5ec6.testing) testing; urgency=medium
 
   [berbascum]
+  * (abc5ec6) Update: pkg_rootfs packaging dir content 
+  * (08854b6) Update: debian packaging .dirs file to add /etc/berb-apt-mgr 
+  * (52549f0) Update: some varnames optimization 
+  * (4c32e75) Refactor: createconf fragments feature to be more accurated on the conf files generation 
+  * (2592644) Neu: repo.list template implemented 
+  * (370179e) Update: fn_gen_Release and fn_sign_Release were adapted to the last new features since lthe last tagged version 
+  * (8a6d9f7) Update: Add an ask to call the fn_mkdirs in the main script's fn_apt_repo_configs_create 
+  * (ecb5068) Update: doc README.md 
+  * (fe5a621) Update: help in the main script 
+  * (2f02aab) Update: Using the splitted Src and Bin Directorys templates, the aptgenerate autogeneration is working 
+  * (af3af7d) Split: Src and Bin Directorys was splitted from aptftp-Directorys template 
+  * (6d00527) Update: aptftp and aptgenerate conf files generatios is finished, but the SrcDirectory need to be splitted to avoid repetitions 
+  * (374e68c) Update: Enable the berb-apt-mgr-main.conf on the main script, and some other little improvement 
+  * (5f1ca9c) Rename: aptftp conf templates and reorganized some configs to optimize the fragments generation 
+  * (c6c514f) Split: some vars that not need to be edited were splitted from berb-apt-mgr.conf to berb-apt-mgr-main.conf 
+  * (9348f4a) Update: gen_config_fragments, the aptgenerate template was splitted on two files for optimizing replacements 
+  * (c249b65) Update: improvements on aptgenerate config templates generation as fragments 
+  * (92deaf1) New: aptgenerate config templates are build and configured dinamically for each release and arch, first step completed 
+  * (aaf89c0) Rename: conf-file-template berb-apt-mgr.conf to berb-apt-mgr_template.conf 
+  * (c17e95d) Rename: apt-repo.conf to berb-apt-mgr.conf to avoid confusions with the apt-ftparchive conf files 
+  * (1b3616e) Add aptftp.conf and aptgenerate.conf basic templates, will be used by main script loops to dinamically generate the config files 
+  * (31e7072) Update: apt-repo.conf with new array containing a base_dirs list 
+  * (5d3e43c) Update: enable multi-release fase_1, --mkdirs completed 
+  * (7aad238) Update: help function moved to begin in the main script 
+  * (812e1aa) Update: help in the main script 
+  * (95170cd) Update: doc README.md 
+  * (25a9479) Build "testing/1.0.0.1" version: debian/changelog and other version related upgrades 
   * (a5a1431) Fix package description in debian/control 
   * (b096f6e) Update pkg_rootfs packaging dir 
   * (6204251) Update: doc README.md 
@@ -11,4 +38,4 @@ berb-apt-mgr (1.0.0.1+git20240614094454.a5a1431.testing) testing; urgency=medium
   * (2db43f3) Add debian packaging 
   * (3c38139) Update README.md with initial help 
 
- -- berbascum <berbascum@ticv.cat>  Fri, 14 Jun 2024 09:44:54 +0200
+ -- berbascum <berbascum@ticv.cat>  Sat, 15 Jun 2024 14:14:22 +0200
