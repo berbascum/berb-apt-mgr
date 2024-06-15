@@ -125,7 +125,7 @@ fn_apt_repo_configs_create() {
     fn_check_templates
     #
     ## Create the aptgenerate config file base from the template, no need replacements
-    cp -v "${aptgen_templ_file}" "${apt_conf_dir}/${aptgen_conf_filename}"
+    cp -v "${aptgen_templ_file}" "${aptgen_conf_relpath_file}"
     #
     ## Create the config fragments nedded to string replacement for each release and archin berb conf
     for release in ${arr_releases[@]}; do
@@ -137,27 +137,27 @@ fn_apt_repo_configs_create() {
         sed -i "s/REPLACE_LABEL/${releases_label}/g" "${aptftp_conf_frag}"
         sed -i "s/REPLACE_DESCRIPTION/${releases_description}/g" "${aptftp_conf_frag}"
         sed -i "s/replace_archs_list/${architectures_archs_list}/g" "${aptftp_conf_frag}"
-        cat "${aptftp_conf_frag}" >> "${apt_conf_dir}/${aptftp_conf_filename}"
+        cat "${aptftp_conf_frag}" >> "${aptftp_conf_relpath_file}"
         ## Create aptconf BinDir fragments and merge in aptgenerate.conf
         for arch in ${arr_archs[@]}; do
 	    aptconf_BinDir_frag="${apt_conf_dir}/fragments/aptconf-BinDir-${release}-${arch}.fragment"
             cp -v "${aptconf_BinDir_templ_file}" "${aptconf_BinDir_frag}"
             sed -i "s/REPLACE_RELEASE/${release}/g" "${aptconf_BinDir_frag}"
             sed -i "s/REPLACE_ARCH/${arch}/g" "${aptconf_BinDir_frag}"
-            cat "${aptconf_BinDir_frag}" >> "${apt_conf_dir}/${aptgen_conf_filename}"
+            cat "${aptconf_BinDir_frag}" >> "${aptgen_conf_relpath_file}"
         done
         ## Create aptconf SrcDir fragments and merge in aptgenerate.conf
 	aptconf_SrcDir_frag="${apt_conf_dir}/fragments/aptconf-SrcDir-${release}.fragment"
         cp -v "${aptconf_SrcDir_templ_file}" "${aptconf_SrcDir_frag}"
         sed -i "s/REPLACE_RELEASE/${release}/g" "${aptconf_SrcDir_frag}"
         sed -i "s/REPLACE_ARCH/${arch}/g" "${aptconf_SrcDir_frag}"
-        cat "${aptconf_SrcDir_frag}" >> "${apt_conf_dir}/${aptgen_conf_filename}"
+        cat "${aptconf_SrcDir_frag}" >> "${aptgen_conf_relpath_file}"
         ## Create aptconf Tree fragments and merge in aptgenerate.conf
 	aptconf_Tree_frag="${apt_conf_dir}/fragments/aptconf-Tree-${release}.fragment"
         cp -v "${aptconf_Tree_templ_file}" "${aptconf_Tree_frag}"
         sed -i "s/REPLACE_RELEASE/${release}/g" "${aptconf_Tree_frag}"
         sed -i "s/replace_archs_list/${architectures_archs_list}/g" "${aptconf_Tree_frag}"
-        cat "${aptconf_Tree_frag}" >> "${apt_conf_dir}/${aptgen_conf_filename}"
+        cat "${aptconf_Tree_frag}" >> "${aptgen_conf_relpath_file}"
     done
     ## Create the apt list from template
     if [ ! -f "${gpg_pub_filename}.list" ]; then
@@ -185,10 +185,10 @@ fn_gen_Packages() {
 }
 
 fn_gen_Release() {
-        apt-ftparchive generate -c=${apt_conf_dir}/aptftp.conf \
-	    ${apt_conf_dir}/aptgenerate.conf
+    apt-ftparchive generate -c=${aptftp_conf_relpath_file} ${aptgen_conf_relpath_file}
     for release in ${arr_releases[@]}; do
-        apt-ftparchive release -c=${apt_conf_dir}/aptftp.conf dists/${release} >dists/${release}/Release
+        apt-ftparchive release -c=${aptftp_conf_relpath_file} \
+	    dists/${release} >dists/${release}/Release
     done
 }
 
