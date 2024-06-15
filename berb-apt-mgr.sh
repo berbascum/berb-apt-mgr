@@ -105,7 +105,6 @@ fn_get_arch_lists() {
     #echo "architectures_archs_list=${architectures_archs_list}"
     #echo "apt_list_archs_list=${apt_list_archs_list}"
 }
-
 fn_apt_repo_configs_create() {
     ## Ask for dirs creation
     ASK "Want to call the --mkdirs flag? [ y|n ]: "
@@ -164,6 +163,11 @@ fn_apt_repo_configs_create() {
 	        >> "${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
 	done
     done
+    if [ ! -f "${gpg_pub_filename}.list" ]; then
+        cp "${apt_template_list_fullpath_filename}" "${gpg_pub_filename}.list"
+        sed -i "s/REPLACE_ARCHS/${apt_list_archs_list}/g" "${gpg_pub_filename}.list"
+        sed -i "s/REPLACE_FILENAME/${gpg_pub_filename}/g" "${gpg_pub_filename}.list"
+    fi
 }
 [ -n "$(echo "$@" | grep "\-\-createconf")" ] && fn_apt_repo_configs_create && exit 0
 
