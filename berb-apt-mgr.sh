@@ -145,19 +145,25 @@ fn_apt_repo_configs_create() {
 	    "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}"
         cat "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}" \
 	    >> "${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
+	fragment_srcdir_filename="aptftp-SrcDir-${release}.fragment"
+        cp -v "${aptftp_SrcDir_templ_fullpath_filename}" \
+	    "${apt_ftp_config_dirname}/fragments/${fragment_srcdir_filename}"
+        sed -i "s/REPLACE_RELEASE/${release}/g" \
+	    "${apt_ftp_config_dirname}/fragments/${fragment_srcdir_filename}"
+        cat "${apt_ftp_config_dirname}/fragments/${fragment_srcdir_filename}" \
+	    >> "${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
         for arch in ${arr_archs[@]}; do
-	    fragment_dir_filename="aptftp-Directorys-${release}-${arch}.fragment"
-            cp -v "${aptftp_Directorys_templ_fullpath_filename}" \
-	        "${apt_ftp_config_dirname}/fragments/${fragment_dir_filename}"
+	    fragment_bindir_filename="aptftp-BinDir-${release}-${arch}.fragment"
+            cp -v "${aptftp_BinDir_templ_fullpath_filename}" \
+	        "${apt_ftp_config_dirname}/fragments/${fragment_bindir_filename}"
             sed -i "s/REPLACE_RELEASE/${release}/g" \
-	        "${apt_ftp_config_dirname}/fragments/${fragment_dir_filename}"
+	        "${apt_ftp_config_dirname}/fragments/${fragment_bindir_filename}"
             sed -i "s/REPLACE_ARCH/${arch}/g" \
-	        "${apt_ftp_config_dirname}/fragments/${fragment_dir_filename}"
-            cat "${apt_ftp_config_dirname}/fragments/${fragment_dir_filename}" \
+	        "${apt_ftp_config_dirname}/fragments/${fragment_bindir_filename}"
+            cat "${apt_ftp_config_dirname}/fragments/${fragment_bindir_filename}" \
 	        >> "${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
 	done
     done
-    exit
 }
 [ -n "$(echo "$@" | grep "\-\-createconf")" ] && fn_apt_repo_configs_create && exit 0
 
