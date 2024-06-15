@@ -161,9 +161,11 @@ fn_apt_repo_configs_create() {
     done
     ## Create the apt list from template
     if [ ! -f "${gpg_pub_filename}.list" ]; then
+	info "Creating \"${gpg_pub_filename}.list\"..."
         cp "${apt_template_list_fullpath_filename}" "${gpg_pub_filename}.list"
         sed -i "s/REPLACE_ARCHS/${apt_list_archs_list}/g" "${gpg_pub_filename}.list"
         sed -i "s/REPLACE_FILENAME/${gpg_pub_filename}/g" "${gpg_pub_filename}.list"
+        sed -i "s|REPLACE_URL|${apt_list_url}|g" "${gpg_pub_filename}.list"
     fi
 }
 [ -n "$(echo "$@" | grep "\-\-createconf")" ] && fn_apt_repo_configs_create && exit 0
@@ -174,6 +176,7 @@ fn_gen_Packages() {
     ## Remove the packages files in the repo rootdirn
     [ -f "packages-"${arch}".db" ] && rm -f packages-"${arch}".db
     ## Gen Packages files for each arch and release
+    info "Generating \"Package\" files..."
     for release in ${arr_releases[@]}; do
         for arch in ${arr_archs[@]}; do
 	    dpkg-scanpackages --multiversion pool/ \
@@ -185,6 +188,7 @@ fn_gen_Packages() {
 }
 
 fn_gen_Release() {
+    info "Generating \"Release\" files..."
     apt-ftparchive generate -c=${aptftp_conf_relpath_file} ${aptgen_conf_relpath_file}
     for release in ${arr_releases[@]}; do
         apt-ftparchive release -c=${aptftp_conf_relpath_file} \
@@ -193,6 +197,7 @@ fn_gen_Release() {
 }
 
 fn_sign_Release() {
+    info "Signing \"Release\" files..."
     for release in ${arr_releases[@]}; do
         ## Sign
         gpg -abs -u "${KEY_LONG}" -o dists/${release}/Release.gpg dists/${release}/Release
@@ -200,6 +205,7 @@ fn_sign_Release() {
 	    --output dists/"${release}"/InRelease dists/"${release}"/Release
     done
     ## Next shortest is showed at first ilne  with --list-keys --keyid-format long near 
+    info "Exporting \"${gpg_pub_filename}.gpg\"..."
     gpg --export "${KEY_SHORT}" > ${gpg_pub_filename}.gpg
 }
 
