@@ -184,23 +184,21 @@ fn_gen_Packages() {
 }
 
 fn_gen_Release() {
+        apt-ftparchive generate -c=aptftp.conf aptgenerate.conf
     for release in ${arr_releases[@]}; do
-        for arch in ${arr_archs[@]}; do
-            [ "aptftp-${release}-${arch}.conf" ] && fn_gen_apt_configs_from_templates
-        done
+        apt-ftparchive release -c=aptftp.conf dists/${release} >dists/${release}/Release
     done
-    exit
-
-    apt-ftparchive generate -c=aptftp.conf aptgenerate.conf
-    apt-ftparchive release -c=aptftp.conf dists/${suite} >dists/${suite}/Release
 }
+
 fn_sign_Release() {
-    ## Sign
-    gpg -abs -u "${KEY_LONG}" -o dists/${suite}/Release.gpg dists/${suite}/Release
+    for release in ${arr_releases[@]}; do
+        ## Sign
+        gpg -abs -u "${KEY_LONG}" -o dists/${release}/Release.gpg dists/${release}/Release
+        gpg -u "${KEY_LONG}" --clear-sign \
+	    --output dists/"${release}"/InRelease dists/"${release}"/Release
+    done
     ## Next shortest is showed at first ilne  with --list-keys --keyid-format long near 
     gpg --export "${KEY_SHORT}" > ${gpg_pub_filename}.gpg
-    gpg -u "${KEY_LONG}" --clear-sign \
-	--output dists/"${suite}"/InRelease dists/"${suite}"/Release
 }
 
 fn_rebuild_repo() {
