@@ -19,11 +19,8 @@ export TOOL_NAME="$(basename ${BASH_SOURCE[0]} | awk -F'.' '{print $1}')"
 #TOOL_VERSION="1.0.0.1"
 #TOOL_CHANNEL="stable"
 TESTED_BASH_VER='5.2.15'
+BBL_GENERAL_VERSION="1001"                                                                            BBL_NET_VERSION="1001"
 
-ASK() { echo; read -p "$*" answer; }
-info() { echo; echo  "INFO:  $*"; }
-abort() { echo; echo "ABORT: $*"; exit; }
-error() { echo; echo "ABORT: $*"; exit; }
 
 ## Help
 fn_help() {
@@ -50,19 +47,44 @@ fn_help() {
 }
 [ -z "$1" -o -n "$(echo "$@" | grep "\-\-help")" ] && fn_help && exit 0
 
-## Config file
-[ ! -f "berb-apt-mgr.conf" ] &&  abort "berb-apt-mgr.conf not found!"
-[ ! -f "/etc/berb-apt-mgr/berb-apt-mgr-main.conf" ] \
-    &&  abort "/etc/berb-apt-mgr/berb-apt-mgr-main.conf not found!"
-
-## Load main config file
-while read var; do
-    eval ${var}
-done < "/etc/berb-apt-mgr/berb-apt-mgr-main.conf"
-## Load config file
-while read var; do
-    eval ${var}
-done < "berb-apt-mgr.conf"
+fn_bam_global_conf() {
+    ## Libs path vars
+    LIBS_FULLPATH="/usr/lib/${TOOL_NAME}"
+    ## Templates path vars
+    TEMPLATES_FULLPATH="/usr/share/${TOOL_NAME}"
+    ## Log path vars
+    LOG_FULLPATH="${HOME}/logs/${TOOL_NAME}"
+    ## Set main config file vars
+    CONF_MAIN_FILENAME="${TOOL_NAME}-main.conf"
+    CONF_MAIN_FULLPATH="/etc/${TOOL_NAME}"
+    CONF_MAIN_FULLPATH_FILENAME="${CONF_MAIN_FULLPATH}/${CONF_MAIN_FILENAME}"
+    ## Set berb repo config file vars
+    CONF_BERB_REPO_FILENAME="${TOOL_NAME}.conf"
+    CONF_BERB_REPO_FULLPATH="."
+    CONF_BERB_REPO_FULLPATH_FILENAME="${CONF_BERB_REPO_FULLPATH}/${CONF_BERB_REPO_FILENAME}"
+    ## Load libs
+    . /usr/lib/berb-bash-libs/bbl_general_lib_${BBL_GENERAL_VERSION}
+    #. /usr/lib/berb-bash-libs/bbl_net_lib_${BBL_NET_VERSION}
+    ## Config log
+    fn_bbgl_config_log
+    ## Config log level
+    fn_bbgl_config_log_level $@
+    #
+    ## Config files check
+    [ ! -f "${CONF_BERB_REPO_FULLPATH_FILENAME}" ] \
+	&&  abort "${CONF_BERB_REPO_FULLPATH_FILENAME} missing!"
+    [ ! -f "${CONF_MAIN_FULLPATH_FILENAME}" ] &&  abort "\"${CONF_MAIN_FULLPATH_FILENAME}\" missing!"
+    #
+    ## Load global vars section from main config file
+    section="global-vars"
+    fn_bbgl_parse_file_section CONF_MAIN "${section}" "load_section"
+    #
+    ## Load global vars section from main config file
+    section="global-vars"
+    fn_bbgl_parse_file_section CONF_BERB_REPO "${section}" "load_section"
+}
+## Load script global config
+fn_bam_global_conf
 
 fn_mkdirs() {
     info "Creating directory structure..."
