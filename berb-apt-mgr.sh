@@ -112,57 +112,54 @@ fn_apt_repo_configs_create() {
     ## Check for apt-ftp config s dir
     ASK "Any previous aptftp and aptgenerate conf files will be removed. Are you sure? [ y|n ]: "
     [ "${answer}" != "y" ] && abort "Aborted by user"
-    if [ -d "${apt_ftp_config_dirname}/fragments" ]; then
-	rm ${apt_ftp_config_dirname}/*.conf 2>/dev/null
-	rm ${apt_ftp_config_dirname}/fragments/* 2>/dev/null
+    if [ -d "${apt_conf_dir}/fragments" ]; then
+	rm ${apt_conf_dir}/*.conf 2>/dev/null
+	rm ${apt_conf_dir}/fragments/* 2>/dev/null
     else
-        mkdir -p -v "${apt_ftp_config_dirname}"/fragments
+        mkdir -p -v "${apt_conf_dir}"/fragments
     fi
     #
     fn_get_arch_lists
     #
     ## Check for apt-ftp config templates
     fn_check_templates
-    ## Create aptftp config file from the template
-    cp -v "${aptftp_Default_templ_fullpath_filename}" \
-	"${apt_ftp_config_dirname}/${aptftp_conf_filename}"
     #
-    ## Create aptgenerate config files from the template for each release and arch
+    ## Create the aptgenerate config file base from the template, no need replacements
+    cp -v "${aptgen_templ_file}" "${apt_conf_dir}/${aptgen_conf_filename}"
+    #
+    ## Create the config fragments nedded to string replacement for each release and archin berb conf
     for release in ${arr_releases[@]}; do
-	fragment_rel_filename="aptftp-Release-${release}.fragment"
-        cp -v "${aptftp_Release_templ_fullpath_filename}" \
-	    "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}"
-        sed -i "s/REPLACE_RELEASE/${release}/g" \
-	    "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}"
-        sed -i "s/REPLACE_ORIGIN/${releases_origin}/g" \
-	    "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}"
-        sed -i "s/REPLACE_LABEL/${releases_label}/g" \
-	    "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}"
-        sed -i "s/REPLACE_DESCRIPTION/${releases_description}/g" \
-	    "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}"
-        sed -i "s/replace_archs_list/${architectures_archs_list}/g" \
-	    "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}"
-        cat "${apt_ftp_config_dirname}/fragments/${fragment_rel_filename}" \
-	    >> "${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
-	fragment_srcdir_filename="aptftp-SrcDir-${release}.fragment"
-        cp -v "${aptftp_SrcDir_templ_fullpath_filename}" \
-	    "${apt_ftp_config_dirname}/fragments/${fragment_srcdir_filename}"
-        sed -i "s/REPLACE_RELEASE/${release}/g" \
-	    "${apt_ftp_config_dirname}/fragments/${fragment_srcdir_filename}"
-        cat "${apt_ftp_config_dirname}/fragments/${fragment_srcdir_filename}" \
-	    >> "${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
+        ## Create aptftp conf fragments and merge in aptftp.conf
+	aptftp_conf_frag="${apt_conf_dir}/fragments/aptftp-conf-${release}.fragment"
+        cp -v "${aptftp_templ_file}" "${aptftp_conf_frag}"
+        sed -i "s/REPLACE_RELEASE/${release}/g" "${aptftp_conf_frag}"
+        sed -i "s/REPLACE_ORIGIN/${releases_origin}/g" "${aptftp_conf_frag}"
+        sed -i "s/REPLACE_LABEL/${releases_label}/g" "${aptftp_conf_frag}"
+        sed -i "s/REPLACE_DESCRIPTION/${releases_description}/g" "${aptftp_conf_frag}"
+        sed -i "s/replace_archs_list/${architectures_archs_list}/g" "${aptftp_conf_frag}"
+        cat "${aptftp_conf_frag}" >> "${apt_conf_dir}/${aptftp_conf_filename}"
+        ## Create aptconf BinDir fragments and merge in aptgenerate.conf
         for arch in ${arr_archs[@]}; do
-	    fragment_bindir_filename="aptftp-BinDir-${release}-${arch}.fragment"
-            cp -v "${aptftp_BinDir_templ_fullpath_filename}" \
-	        "${apt_ftp_config_dirname}/fragments/${fragment_bindir_filename}"
-            sed -i "s/REPLACE_RELEASE/${release}/g" \
-	        "${apt_ftp_config_dirname}/fragments/${fragment_bindir_filename}"
-            sed -i "s/REPLACE_ARCH/${arch}/g" \
-	        "${apt_ftp_config_dirname}/fragments/${fragment_bindir_filename}"
-            cat "${apt_ftp_config_dirname}/fragments/${fragment_bindir_filename}" \
-	        >> "${apt_ftp_config_dirname}/${aptgenerate_conf_filename}"
-	done
+	    aptconf_BinDir_frag="${apt_conf_dir}/fragments/aptconf-BinDir-${release}-${arch}.fragment"
+            cp -v "${aptconf_BinDir_templ_file}" "${aptconf_BinDir_frag}"
+            sed -i "s/REPLACE_RELEASE/${release}/g" "${aptconf_BinDir_frag}"
+            sed -i "s/REPLACE_ARCH/${arch}/g" "${aptconf_BinDir_frag}"
+            cat "${aptconf_BinDir_frag}" >> "${apt_conf_dir}/${aptgen_conf_filename}"
+        done
+        ## Create aptconf SrcDir fragments and merge in aptgenerate.conf
+	aptconf_SrcDir_frag="${apt_conf_dir}/fragments/aptconf-SrcDir-${release}.fragment"
+        cp -v "${aptconf_SrcDir_templ_file}" "${aptconf_SrcDir_frag}"
+        sed -i "s/REPLACE_RELEASE/${release}/g" "${aptconf_SrcDir_frag}"
+        sed -i "s/REPLACE_ARCH/${arch}/g" "${aptconf_SrcDir_frag}"
+        cat "${aptconf_SrcDir_frag}" >> "${apt_conf_dir}/${aptgen_conf_filename}"
+        ## Create aptconf Tree fragments and merge in aptgenerate.conf
+	aptconf_Tree_frag="${apt_conf_dir}/fragments/aptconf-Tree-${release}.fragment"
+        cp -v "${aptconf_Tree_templ_file}" "${aptconf_Tree_frag}"
+        sed -i "s/REPLACE_RELEASE/${release}/g" "${aptconf_Tree_frag}"
+        sed -i "s/replace_archs_list/${architectures_archs_list}/g" "${aptconf_Tree_frag}"
+        cat "${aptconf_Tree_frag}" >> "${apt_conf_dir}/${aptgen_conf_filename}"
     done
+    ## Create the apt list from template
     if [ ! -f "${gpg_pub_filename}.list" ]; then
         cp "${apt_template_list_fullpath_filename}" "${gpg_pub_filename}.list"
         sed -i "s/REPLACE_ARCHS/${apt_list_archs_list}/g" "${gpg_pub_filename}.list"
@@ -188,9 +185,10 @@ fn_gen_Packages() {
 }
 
 fn_gen_Release() {
-        apt-ftparchive generate -c=aptftp.conf aptgenerate.conf
+        apt-ftparchive generate -c=${apt_conf_dir}/aptftp.conf \
+	    ${apt_conf_dir}/aptgenerate.conf
     for release in ${arr_releases[@]}; do
-        apt-ftparchive release -c=aptftp.conf dists/${release} >dists/${release}/Release
+        apt-ftparchive release -c=${apt_conf_dir}/aptftp.conf dists/${release} >dists/${release}/Release
     done
 }
 
@@ -213,7 +211,7 @@ fn_rebuild_repo() {
         [ ! -f "key-ids.conf" ] &&  abort "key-ids.conf not found!"
         while read var; do eval ${var}; done < "key-ids.conf"
         ## Rebuild apt repo
-        #fn_gen_Packages
+        fn_gen_Packages
         fn_gen_Release
         fn_sign_Release
     fi
