@@ -27,6 +27,7 @@ fn_header_info() {
     URGENCY='optional'
     TESTED_BASH_VER='5.2.15'
 }
+TOOL_NAME="berb-apt-mgr"
 BBL_GENERAL_VERSION="1101"
 BBL_NET_VERSION="1001"
 #[HEADER_END]
