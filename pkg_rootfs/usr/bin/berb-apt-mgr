@@ -10,20 +10,28 @@
 #
 # Copyright (C) 2024 Berbascum <berbascum@ticv.cat>
 # All rights reserved.
-                                                                                            # BSD 3-Clause License
+# BSD 3-Clause License
 
 #################
 ## Header vars ##
 #################
-export TOOL_NAME="$(basename ${BASH_SOURCE[0]} | awk -F'.' '{print $1}')"
-#TOOL_VERSION="1.0.0.1"
-#TOOL_CHANNEL="stable"
-TESTED_BASH_VER='5.2.15'
 
-ASK() { echo; read -p "$*" answer; }
-info() { echo; echo  "INFO:  $*"; }
-abort() { echo; echo "ABORT: $*"; exit; }
-error() { echo; echo "ABORT: $*"; exit; }
+#[HEADER_SECTION]
+fn_header_info() {
+    BIN_TYPE="bin"
+    BIN_SRC_TYPE="bash"
+    BIN_SRC_EXT="sh"
+    BIN_NAME="berb-apt-mgr"
+    TOOL_VERSION="1.0.0.1"
+    TOOL_RELEASE="sid"
+    URGENCY='optional'
+    TESTED_BASH_VER='5.2.15'
+}
+TOOL_NAME="berb-apt-mgr"
+BBL_GENERAL_VERSION="1101"
+BBL_NET_VERSION="1001"
+#[HEADER_END]
+
 
 ## Help
 fn_help() {
@@ -50,19 +58,44 @@ fn_help() {
 }
 [ -z "$1" -o -n "$(echo "$@" | grep "\-\-help")" ] && fn_help && exit 0
 
-## Config file
-[ ! -f "berb-apt-mgr.conf" ] &&  abort "berb-apt-mgr.conf not found!"
-[ ! -f "/etc/berb-apt-mgr/berb-apt-mgr-main.conf" ] \
-    &&  abort "/etc/berb-apt-mgr/berb-apt-mgr-main.conf not found!"
-
-## Load main config file
-while read var; do
-    eval ${var}
-done < "/etc/berb-apt-mgr/berb-apt-mgr-main.conf"
-## Load config file
-while read var; do
-    eval ${var}
-done < "berb-apt-mgr.conf"
+fn_bam_global_conf() {
+    ## Libs path vars
+    LIBS_FULLPATH="/usr/lib/${TOOL_NAME}"
+    ## Templates path vars
+    TEMPLATES_FULLPATH="/usr/share/${TOOL_NAME}"
+    ## Log path vars
+    LOG_FULLPATH="${HOME}/logs/${TOOL_NAME}"
+    ## Set main config file vars
+    CONF_MAIN_FILENAME="${TOOL_NAME}-main.conf"
+    CONF_MAIN_FULLPATH="/etc/${TOOL_NAME}"
+    CONF_MAIN_FULLPATH_FILENAME="${CONF_MAIN_FULLPATH}/${CONF_MAIN_FILENAME}"
+    ## Set berb repo config file vars
+    CONF_BERB_REPO_FILENAME="${TOOL_NAME}.conf"
+    CONF_BERB_REPO_FULLPATH="."
+    CONF_BERB_REPO_FULLPATH_FILENAME="${CONF_BERB_REPO_FULLPATH}/${CONF_BERB_REPO_FILENAME}"
+    ## Load libs
+    . /usr/lib/berb-bash-libs/bbl_general_lib_${BBL_GENERAL_VERSION}
+    #. /usr/lib/berb-bash-libs/bbl_net_lib_${BBL_NET_VERSION}
+    ## Config log
+    fn_bbgl_config_log
+    ## Config log level
+    fn_bbgl_config_log_level $@
+    #
+    ## Config files check
+    [ ! -f "${CONF_BERB_REPO_FULLPATH_FILENAME}" ] \
+	&&  abort "${CONF_BERB_REPO_FULLPATH_FILENAME} missing!"
+    [ ! -f "${CONF_MAIN_FULLPATH_FILENAME}" ] &&  abort "\"${CONF_MAIN_FULLPATH_FILENAME}\" missing!"
+    #
+    ## Load global vars section from main config file
+    section="global-vars"
+    fn_bbgl_parse_file_section CONF_MAIN "${section}" "load_section"
+    #
+    ## Load global vars section from main config file
+    section="global-vars"
+    fn_bbgl_parse_file_section CONF_BERB_REPO "${section}" "load_section"
+}
+## Load script global config
+fn_bam_global_conf
 
 fn_mkdirs() {
     info "Creating directory structure..."
@@ -161,9 +194,11 @@ fn_apt_repo_configs_create() {
     done
     ## Create the apt list from template
     if [ ! -f "${gpg_pub_filename}.list" ]; then
+	info "Creating \"${gpg_pub_filename}.list\"..."
         cp "${apt_template_list_fullpath_filename}" "${gpg_pub_filename}.list"
         sed -i "s/REPLACE_ARCHS/${apt_list_archs_list}/g" "${gpg_pub_filename}.list"
         sed -i "s/REPLACE_FILENAME/${gpg_pub_filename}/g" "${gpg_pub_filename}.list"
+        sed -i "s|REPLACE_URL|${apt_list_url}|g" "${gpg_pub_filename}.list"
     fi
 }
 [ -n "$(echo "$@" | grep "\-\-createconf")" ] && fn_apt_repo_configs_create && exit 0
@@ -174,6 +209,7 @@ fn_gen_Packages() {
     ## Remove the packages files in the repo rootdirn
     [ -f "packages-"${arch}".db" ] && rm -f packages-"${arch}".db
     ## Gen Packages files for each arch and release
+    info "Generating \"Package\" files..."
     for release in ${arr_releases[@]}; do
         for arch in ${arr_archs[@]}; do
 	    dpkg-scanpackages --multiversion pool/ \
@@ -185,6 +221,7 @@ fn_gen_Packages() {
 }
 
 fn_gen_Release() {
+    info "Generating \"Release\" files..."
     apt-ftparchive generate -c=${aptftp_conf_relpath_file} ${aptgen_conf_relpath_file}
     for release in ${arr_releases[@]}; do
         apt-ftparchive release -c=${aptftp_conf_relpath_file} \
@@ -193,6 +230,7 @@ fn_gen_Release() {
 }
 
 fn_sign_Release() {
+    info "Signing \"Release\" files..."
     for release in ${arr_releases[@]}; do
         ## Sign
         gpg -abs -u "${KEY_LONG}" -o dists/${release}/Release.gpg dists/${release}/Release
@@ -200,6 +238,7 @@ fn_sign_Release() {
 	    --output dists/"${release}"/InRelease dists/"${release}"/Release
     done
     ## Next shortest is showed at first ilne  with --list-keys --keyid-format long near 
+    info "Exporting \"${gpg_pub_filename}.gpg\"..."
     gpg --export "${KEY_SHORT}" > ${gpg_pub_filename}.gpg
 }
 

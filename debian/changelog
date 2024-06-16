@@ -1,6 +1,13 @@
-berb-apt-mgr (2.0.0.1+git20240615141422.abc5ec6.testing) testing; urgency=medium
+berb-apt-mgr (2.0.0.1+git20240616195116.86af147.testing) testing; urgency=medium
 
   [berbascum]
+  * (86af147) Update: add TOOL_NAME var in main script HEADER 
+  * (fa7360d) Update: bbl_general_lib deps were upgraded to version 1.1.0.1 in debian/control and main script 
+  * (73710cc) Rename: main src was renamed and updated with some header extra info to use with bbl_generan_parse_header_section feature 
+  * (835fb58) Deps: add berb-bash-libs: bbl_general_lib >= 1.0.0.1 to debian/control 
+  * (51a61da) Integrate: the main script has been integrated with berb-bash-libs 1.0.0.1 version 
+  * (a545a66) Update: in fn_apt_repo_configs_create, the apt.list url is configured using the apt_list_url new var 
+  * (d5ad268) Build "testing/2.0.0.1" version: debian/changelog and other version related upgrades 
   * (abc5ec6) Update: pkg_rootfs packaging dir content 
   * (08854b6) Update: debian packaging .dirs file to add /etc/berb-apt-mgr 
   * (52549f0) Update: some varnames optimization 
@@ -26,16 +33,5 @@ berb-apt-mgr (2.0.0.1+git20240615141422.abc5ec6.testing) testing; urgency=medium
   * (5d3e43c) Update: enable multi-release fase_1, --mkdirs completed 
   * (7aad238) Update: help function moved to begin in the main script 
   * (812e1aa) Update: help in the main script 
-  * (95170cd) Update: doc README.md 
-  * (25a9479) Build "testing/1.0.0.1" version: debian/changelog and other version related upgrades 
-  * (a5a1431) Fix package description in debian/control 
-  * (b096f6e) Update pkg_rootfs packaging dir 
-  * (6204251) Update: doc README.md 
-  * (e67c7b3) Add .gitignore 
-  * (6b78f38) Add pkg_rootfs packaging dir 
-  * (e8bd3d6) Rename the main script 
-  * (5f44fee) Move config files to conf_templates dir 
-  * (2db43f3) Add debian packaging 
-  * (3c38139) Update README.md with initial help 
 
- -- berbascum <berbascum@ticv.cat>  Sat, 15 Jun 2024 14:14:22 +0200
+ -- berbascum <berbascum@ticv.cat>  Sun, 16 Jun 2024 19:51:16 +0200
