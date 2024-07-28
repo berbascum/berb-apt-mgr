@@ -168,7 +168,7 @@ fn_apt_repo_configs_create() {
         sed -i "s/REPLACE_RELEASE/${release}/g" "${aptftp_conf_frag}"
         sed -i "s/REPLACE_ORIGIN/${releases_origin}/g" "${aptftp_conf_frag}"
         sed -i "s/REPLACE_LABEL/${releases_label}/g" "${aptftp_conf_frag}"
-        sed -i "s/REPLACE_DESCRIPTION/${releases_description}/g" "${aptftp_conf_frag}"
+        sed -i "s/REPLACE_DESC/${releases_description}/g" "${aptftp_conf_frag}"
         sed -i "s/replace_archs_list/${architectures_archs_list}/g" "${aptftp_conf_frag}"
         cat "${aptftp_conf_frag}" >> "${aptftp_conf_relpath_file}"
         ## Create aptconf BinDir fragments and merge in aptgenerate.conf
