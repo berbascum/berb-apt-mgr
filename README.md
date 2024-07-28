@@ -1,6 +1,12 @@
 # Another bash script to manage an apt repo
 Simple bash script to manage a configurable multiarch and multirelease apt repository
 
+### version 2.0.2.1-stable
+- Supports multiarch and multi-release configurable in a config file
+- Full repo dir structure creation
+- Generates the apt-ftparchive config files dinamically from templates
+- Rebuild repo after adding deb packages
+
 ## Installation
 The script can be installed from berbascum's git apt repo
 sudo wget -o /usr/share/keyrings/berb-apt.gpg  https://github.com/berbascum/berb-apt-git-repo/raw/main/berb-apt.gpg
