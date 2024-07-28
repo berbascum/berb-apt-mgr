@@ -300,6 +300,16 @@ fn_rebuild_repo() {
         fn_gen_Packages
         fn_gen_Release
         fn_sign_Release
+	#
+	## Ask to commit and push rebuild changes
+        ASK "Want to commit the rebuild? [ y|n ]: "
+        [ "${answer}" != "y" ] && exit
+	git add -A
+	git commit -m "Rebuild repository"
+        ASK "Want to push to origin-main?? [ y|n ]: "
+        [ "${answer}" != "y" ] && exit
+	git lfs push --all origin main
+        git push -u origin main
     fi
 }
 [ -n "$(echo "$@" | grep "\-\-rebuild")" ] && fn_rebuild_repo && exit 0
