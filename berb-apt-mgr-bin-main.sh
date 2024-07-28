@@ -279,9 +279,9 @@ fn_sign_Release() {
     info "Signing \"Release\" files..."
     for release in ${arr_releases[@]}; do
         ## Sign
-        gpg -abs -u "${KEY_LONG}" \
+        gpg --batch --yes -abs -u "${KEY_LONG}" \
 	    -o dists/${release}/Release.gpg dists/${release}/Release
-        gpg --yes -u "${KEY_LONG}" --clear-sign \
+        gpg --batch --yes -u "${KEY_LONG}" --clear-sign \
 	    --output dists/"${release}"/InRelease dists/"${release}"/Release
     done
     ## Next shortest is showed at first ilne  with --list-keys --keyid-format long near 
