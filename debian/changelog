@@ -1,37 +1,11 @@
-berb-apt-mgr (2.0.0.1+git20240616195116.86af147.testing) testing; urgency=medium
+berb-apt-mgr (2.0.2.1+git20240728192704.38410ea.stable) stable; urgency=medium
 
   [berbascum]
-  * (86af147) Update: add TOOL_NAME var in main script HEADER 
-  * (fa7360d) Update: bbl_general_lib deps were upgraded to version 1.1.0.1 in debian/control and main script 
-  * (73710cc) Rename: main src was renamed and updated with some header extra info to use with bbl_generan_parse_header_section feature 
-  * (835fb58) Deps: add berb-bash-libs: bbl_general_lib >= 1.0.0.1 to debian/control 
-  * (51a61da) Integrate: the main script has been integrated with berb-bash-libs 1.0.0.1 version 
-  * (a545a66) Update: in fn_apt_repo_configs_create, the apt.list url is configured using the apt_list_url new var 
-  * (d5ad268) Build "testing/2.0.0.1" version: debian/changelog and other version related upgrades 
-  * (abc5ec6) Update: pkg_rootfs packaging dir content 
-  * (08854b6) Update: debian packaging .dirs file to add /etc/berb-apt-mgr 
-  * (52549f0) Update: some varnames optimization 
-  * (4c32e75) Refactor: createconf fragments feature to be more accurated on the conf files generation 
-  * (2592644) Neu: repo.list template implemented 
-  * (370179e) Update: fn_gen_Release and fn_sign_Release were adapted to the last new features since lthe last tagged version 
-  * (8a6d9f7) Update: Add an ask to call the fn_mkdirs in the main script's fn_apt_repo_configs_create 
-  * (ecb5068) Update: doc README.md 
-  * (fe5a621) Update: help in the main script 
-  * (2f02aab) Update: Using the splitted Src and Bin Directorys templates, the aptgenerate autogeneration is working 
-  * (af3af7d) Split: Src and Bin Directorys was splitted from aptftp-Directorys template 
-  * (6d00527) Update: aptftp and aptgenerate conf files generatios is finished, but the SrcDirectory need to be splitted to avoid repetitions 
-  * (374e68c) Update: Enable the berb-apt-mgr-main.conf on the main script, and some other little improvement 
-  * (5f1ca9c) Rename: aptftp conf templates and reorganized some configs to optimize the fragments generation 
-  * (c6c514f) Split: some vars that not need to be edited were splitted from berb-apt-mgr.conf to berb-apt-mgr-main.conf 
-  * (9348f4a) Update: gen_config_fragments, the aptgenerate template was splitted on two files for optimizing replacements 
-  * (c249b65) Update: improvements on aptgenerate config templates generation as fragments 
-  * (92deaf1) New: aptgenerate config templates are build and configured dinamically for each release and arch, first step completed 
-  * (aaf89c0) Rename: conf-file-template berb-apt-mgr.conf to berb-apt-mgr_template.conf 
-  * (c17e95d) Rename: apt-repo.conf to berb-apt-mgr.conf to avoid confusions with the apt-ftparchive conf files 
-  * (1b3616e) Add aptftp.conf and aptgenerate.conf basic templates, will be used by main script loops to dinamically generate the config files 
-  * (31e7072) Update: apt-repo.conf with new array containing a base_dirs list 
-  * (5d3e43c) Update: enable multi-release fase_1, --mkdirs completed 
-  * (7aad238) Update: help function moved to begin in the main script 
-  * (812e1aa) Update: help in the main script 
+  * (38410ea) Update files in the pkg_rootfs dir 
+  * (a529d3f) Update README.md 
+  * (0417339) Update version strings 
+  * (8ba959c) New feature: Ask to commit and push after a repo rebuild 
+  * (ed48078) Improve Release signing: add --batch --yes to the signing commands 
+  * (b7602b9) Fix: multirelease and multiarch creation were not working, now is fixed 
 
- -- berbascum <berbascum@ticv.cat>  Sun, 16 Jun 2024 19:51:16 +0200
+ -- berbascum <berbascum@ticv.cat>  Sun, 28 Jul 2024 19:27:04 +0200
