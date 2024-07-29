@@ -22,7 +22,7 @@ fn_header_info() {
     BIN_SRC_TYPE="bash"
     BIN_SRC_EXT="sh"
     BIN_NAME="berb-apt-mgr"
-    TOOL_VERSION="2.0.2.1"
+    TOOL_VERSION="2.0.3.1"
     TOOL_RELEASE="stable"
     URGENCY='optional'
     TESTED_BASH_VER='5.2.15'
