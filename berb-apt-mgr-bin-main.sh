@@ -257,19 +257,6 @@ fn_apt_repo_configs_create() {
 fn_gen_Packages() {
     ## First copy the debs to pool/<release>/main
     #
-    ## Remove the packages files in the repo rootdirn
-    [ -f "packages-"${arch}".db" ] && rm -f packages-"${arch}".db
-    ## Gen Packages files for each arch and release
-    info "Generating \"Package\" files..."
-    for release in ${arr_releases[@]}; do
-        for arch in ${arr_archs[@]}; do
-	    dpkg-scanpackages --multiversion \
-	        pool/"${release}"/main/binary-"${arch}" \
-	        > dists/"${release}"/main/binary-"${arch}"/Packages
-            cat dists/${release}/main/binary-"${arch}"/Packages | gzip -9 \
-	        > dists/${release}/main/binary-"${arch}"/Packages.gz
-	done
-    done
 }
 
 fn_gen_Release() {
