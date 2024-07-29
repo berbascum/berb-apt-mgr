@@ -22,7 +22,7 @@ fn_header_info() {
     BIN_SRC_TYPE="bash"
     BIN_SRC_EXT="sh"
     BIN_NAME="berb-apt-mgr"
-    TOOL_VERSION="2.0.2.1"
+    TOOL_VERSION="2.0.0.1"
     TOOL_RELEASE="stable"
     URGENCY='optional'
     TESTED_BASH_VER='5.2.15'
@@ -261,18 +261,36 @@ fn_gen_Packages() {
 }
 
 fn_gen_Release() {
-    info "Generating \"Release\" files..."
     for release in ${arr_releases[@]}; do
+        info "Generating \"metadata\" files..."
         ## Set per release apt conf files
         fn_conf_filenames_set
-        ## Create Releases
+        ## Create metadata
         apt-ftparchive generate \
-	 -c=${apt_conf_dir}/${aptftp_conf_full_filename} \
-	    ${apt_conf_dir}/${aptgen_conf_full_filename}
-        apt-ftparchive release \
-	 -c=${apt_conf_dir}/${aptftp_conf_full_filename} \
-	    dists/${release} >dists/${release}/Release
+	-c=${apt_conf_dir}/${aptftp_conf_full_filename} \
+	${apt_conf_dir}/${aptgen_conf_full_filename}
+        ## Create Releases
+        info "Generating \"Release\" files..."
+        apt-ftparchive \
+	-c=${apt_conf_dir}/${aptftp_conf_full_filename} \
+            release dists/${release}/ \
+	    >dists/${release}/Release
     done
+}
+fn_gen_Release-stable() {
+        info "Generating \"metadata\" files..."
+        ## Set per release apt conf files
+        fn_conf_filenames_set
+        ## Create metadata
+        apt-ftparchive generate \
+	-c=${apt_conf_dir}/aptftp-stable.conf \
+	${apt_conf_dir}/aptgenerate-stable.conf
+        ## Create Releases
+        info "Generating \"Release\" files..."
+        apt-ftparchive \
+	-c=${apt_conf_dir}/aptftp-stable.conf \
+            release dists/stable/ \
+	    >dists/stable/Release
 }
 
 fn_sign_Release() {
@@ -298,7 +316,8 @@ fn_rebuild_repo() {
         while read var; do eval ${var}; done < "key-ids.conf"
         ## Rebuild apt repo
         fn_gen_Packages
-        fn_gen_Release
+        #fn_gen_Release
+        fn_gen_Release-stable
         fn_sign_Release
 	#
 	## Ask to commit and push rebuild changes
@@ -308,7 +327,7 @@ fn_rebuild_repo() {
 	git commit -m "Rebuild repository"
         ASK "Want to push to origin-main?? [ y|n ]: "
         [ "${answer}" != "y" ] && exit
-        git push origin main
+	git push origin main
     fi
 }
 [ -n "$(echo "$@" | grep "\-\-rebuild")" ] && fn_rebuild_repo && exit 0
