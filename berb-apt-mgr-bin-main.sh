@@ -255,8 +255,17 @@ fn_apt_repo_configs_create() {
     && fn_apt_repo_configs_create && exit 0
 
 fn_gen_Packages() {
-    ## First copy the debs to pool/<release>/main
+    ## First copy the debs to pool/<release>/main/binary-<arch>
     #
+    for release in ${arr_releases[@]}; do
+        ## Set per release apt conf files
+        fn_conf_filenames_set
+        ## Create Packages and Content
+	info "Generating \"Packages\" for \"${release}\"..."
+        apt-ftparchive generate \
+	 -c=${apt_conf_dir}/${aptftp_conf_full_filename} \
+	    ${apt_conf_dir}/${aptgen_conf_full_filename}
+    done
 }
 
 fn_gen_Release() {
@@ -264,10 +273,6 @@ fn_gen_Release() {
         ## Set per release apt conf files
         fn_conf_filenames_set
         ## Create Releases
-	info "Generating \"metadata\" for \"${release}\"..."
-        apt-ftparchive generate \
-	 -c=${apt_conf_dir}/${aptftp_conf_full_filename} \
-	    ${apt_conf_dir}/${aptgen_conf_full_filename}
 	info "Generating \"Release\" for \"${release}\"..."
         apt-ftparchive release \
 	 -c=${apt_conf_dir}/${aptftp_conf_full_filename} \
@@ -303,7 +308,7 @@ fn_rebuild_repo() {
 	    &&  abort "key-ids.conf not found!"
         while read var; do eval ${var}; done < "key-ids.conf"
         ## Rebuild apt repo
-#        fn_gen_Packages
+        fn_gen_Packages
         fn_gen_Release
         fn_sign_Release
 	#
