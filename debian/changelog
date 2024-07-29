@@ -1,11 +1,3 @@
-berb-apt-mgr (2.0.2.1+git20240728192704.38410ea.stable) stable; urgency=medium
+berb-apt-mgr (2.0.3.1+git20240729202651.780c538.stable) stable; urgency=medium
 
-  [berbascum]
-  * (38410ea) Update files in the pkg_rootfs dir 
-  * (a529d3f) Update README.md 
-  * (0417339) Update version strings 
-  * (8ba959c) New feature: Ask to commit and push after a repo rebuild 
-  * (ed48078) Improve Release signing: add --batch --yes to the signing commands 
-  * (b7602b9) Fix: multirelease and multiarch creation were not working, now is fixed 
-
- -- berbascum <berbascum@ticv.cat>  Sun, 28 Jul 2024 19:27:04 +0200
+ -- berbascum <berbascum@ticv.cat>  Mon, 29 Jul 2024 20:26:51 +0200

@@ -22,7 +22,7 @@ fn_header_info() {
     BIN_SRC_TYPE="bash"
     BIN_SRC_EXT="sh"
     BIN_NAME="berb-apt-mgr"
-    TOOL_VERSION="2.0.2.1"
+    TOOL_VERSION="2.0.3.1"
     TOOL_RELEASE="stable"
     URGENCY='optional'
     TESTED_BASH_VER='5.2.15'
@@ -84,15 +84,18 @@ fn_bam_global_conf() {
     ## Config files check
     [ ! -f "${CONF_BERB_REPO_FULLPATH_FILENAME}" ] \
 	&&  abort "${CONF_BERB_REPO_FULLPATH_FILENAME} missing!"
-    [ ! -f "${CONF_MAIN_FULLPATH_FILENAME}" ] &&  abort "\"${CONF_MAIN_FULLPATH_FILENAME}\" missing!"
+    [ ! -f "${CONF_MAIN_FULLPATH_FILENAME}" ] \
+	&&  abort "\"${CONF_MAIN_FULLPATH_FILENAME}\" missing!"
     #
     ## Load global vars section from main config file
     section="global-vars"
-    fn_bbgl_parse_file_section CONF_MAIN "${section}" "load_section"
+    fn_bbgl_parse_file_section CONF_MAIN "${section}" \
+	"load_section"
     #
     ## Load global vars section from main config file
     section="global-vars"
-    fn_bbgl_parse_file_section CONF_BERB_REPO "${section}" "load_section"
+    fn_bbgl_parse_file_section CONF_BERB_REPO "${section}" \
+        "load_section"
 }
 ## Load script global config
 fn_bam_global_conf
@@ -102,20 +105,22 @@ fn_mkdirs() {
     ## Create pool dirs
     for release in ${arr_releases[@]}; do
         mkdir -p -v "dists/${release}/main/source"
+        mkdir -p -v cache/${release}
         for base_dir in ${arr_base_dirs[@]}; do
             for arch in ${arr_archs[@]}; do
-                mkdir -p -v "${base_dir}/${release}/main/binary-${arch}"
+                mkdir -p -v \
+		    "${base_dir}/${release}/main/binary-${arch}"
             done
          done
     done
-    mkdir -v state cache
 }
 [ -n "$(echo "$@" | grep "\-\-mkdirs")" ] && fn_mkdirs && exit 0
 
 
 fn_check_templates() {
     for template in ${arr_aptconf_templates[@]}; do
-        [ ! -f "${template}" ] && error "\"${template}\" template not found!"
+        [ ! -f "${template}" ] \
+	    && error "\"${template}\" template not found!"
     done
 }
 
@@ -179,6 +184,8 @@ fn_apt_repo_configs_create() {
         ## conf file from template, one file per release
         cp -v "${aptgen_templ_file}" \
 	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
+        sed -i "s/REPLACE_RELEASE/${release}/g" \
+	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
         ## Create aptconf BinDir fragments
 	## and merge in aptgenerate.conf
         for arch in ${arr_archs[@]}; do
@@ -234,67 +241,71 @@ fn_apt_repo_configs_create() {
     ## Create the apt list from template
     if [ ! -f "${gpg_pub_filename}.list" ]; then
 	info "Creating \"${gpg_pub_filename}.list\"..."
-        cp "${apt_template_list_fullpath_filename}" "${gpg_pub_filename}.list"
-        sed -i "s/REPLACE_ARCHS/${apt_list_archs_list}/g" "${gpg_pub_filename}.list"
-        sed -i "s/REPLACE_FILENAME/${gpg_pub_filename}/g" "${gpg_pub_filename}.list"
-        sed -i "s|REPLACE_URL|${apt_list_url}|g" "${gpg_pub_filename}.list"
+        cp "${apt_template_list_fullpath_filename}" \
+	    "${gpg_pub_filename}.list"
+        sed -i "s/REPLACE_ARCHS/${apt_list_archs_list}/g" \
+	    "${gpg_pub_filename}.list"
+        sed -i "s/REPLACE_FILENAME/${gpg_pub_filename}/g" \
+	    "${gpg_pub_filename}.list"
+        sed -i "s|REPLACE_URL|${apt_list_url}|g" \
+	    "${gpg_pub_filename}.list"
     fi
 }
-[ -n "$(echo "$@" | grep "\-\-createconf")" ] && fn_apt_repo_configs_create && exit 0
+[ -n "$(echo "$@" | grep "\-\-createconf")" ] \
+    && fn_apt_repo_configs_create && exit 0
 
 fn_gen_Packages() {
-    ## First copy the debs to pool/<release>/main
+    ## First copy the debs to pool/<release>/main/binary-<arch>
     #
-    ## Remove the packages files in the repo rootdirn
-    [ -f "packages-"${arch}".db" ] && rm -f packages-"${arch}".db
-    ## Gen Packages files for each arch and release
-    info "Generating \"Package\" files..."
     for release in ${arr_releases[@]}; do
-        for arch in ${arr_archs[@]}; do
-	    dpkg-scanpackages --multiversion \
-	        pool/"${release}"/main/binary-"${arch}" \
-	        > dists/"${release}"/main/binary-"${arch}"/Packages
-            cat dists/${release}/main/binary-"${arch}"/Packages | gzip -9 \
-	        > dists/${release}/main/binary-"${arch}"/Packages.gz
-	done
+        ## Set per release apt conf files
+        fn_conf_filenames_set
+        ## Create Packages and Content
+	info "Generating \"Packages\" for \"${release}\"..."
+        apt-ftparchive generate \
+	 -c=${apt_conf_dir}/${aptftp_conf_full_filename} \
+	    ${apt_conf_dir}/${aptgen_conf_full_filename}
     done
 }
 
 fn_gen_Release() {
-    info "Generating \"Release\" files..."
     for release in ${arr_releases[@]}; do
         ## Set per release apt conf files
         fn_conf_filenames_set
         ## Create Releases
-        apt-ftparchive generate \
-	 -c=${apt_conf_dir}/${aptftp_conf_full_filename} \
-	    ${apt_conf_dir}/${aptgen_conf_full_filename}
+	info "Generating \"Release\" for \"${release}\"..."
         apt-ftparchive release \
 	 -c=${apt_conf_dir}/${aptftp_conf_full_filename} \
-	    dists/${release} >dists/${release}/Release
+	    dists/${release} > dists/${release}/Release
     done
 }
 
 fn_sign_Release() {
-    info "Signing \"Release\" files..."
     for release in ${arr_releases[@]}; do
+        info "Signing \"Release\" for \"${release}\"..."
         ## Sign
         gpg --batch --yes -abs -u "${KEY_LONG}" \
-	    -o dists/${release}/Release.gpg dists/${release}/Release
+	    -o dists/${release}/Release.gpg \
+	    dists/${release}/Release
         gpg --batch --yes -u "${KEY_LONG}" --clear-sign \
-	    --output dists/"${release}"/InRelease dists/"${release}"/Release
+	    --output dists/"${release}"/InRelease \
+	    dists/"${release}"/Release
     done
-    ## Next shortest is showed at first ilne  with --list-keys --keyid-format long near 
+    ## Next shortest is showed at first ilne with 
+    ## --list-keys --keyid-format long near 
     info "Exporting \"${gpg_pub_filename}.gpg\"..."
     gpg --export "${KEY_SHORT}" > ${gpg_pub_filename}.gpg
 }
 
 fn_rebuild_repo() {
     if [ -d "pool" ]; then
+        ## Clean cache databases
+        rm -v cache/*/*
         ASK "Rescan and sign the repo? [ y|n ]: "
         [ "${answer}" != "y" ] && exit
         ## Load key-ids
-        [ ! -f "key-ids.conf" ] &&  abort "key-ids.conf not found!"
+        [ ! -f "key-ids.conf" ] \
+	    &&  abort "key-ids.conf not found!"
         while read var; do eval ${var}; done < "key-ids.conf"
         ## Rebuild apt repo
         fn_gen_Packages
@@ -304,13 +315,18 @@ fn_rebuild_repo() {
 	## Ask to commit and push rebuild changes
         ASK "Want to commit the rebuild? [ y|n ]: "
         [ "${answer}" != "y" ] && exit
-	git add -A
-	git commit -m "Rebuild repository"
-        ASK "Want to push to origin-main?? [ y|n ]: "
+	commit_msg=""
+        ASK "Type a short commit msg or leave empty: "
+        [ -n "${answer}" ] && commit_msg=": ${answer}"
+        ## Add and commit
+	git add cache dists
+	git commit -m "Rebuild repository${commit_msg}"
+        ASK "Want to push main to origin? [ y|n ]: "
         [ "${answer}" != "y" ] && exit
-	git lfs push --all origin main
-        git push -u origin main
+	## Push main to origin
+        git push origin main
     fi
 }
-[ -n "$(echo "$@" | grep "\-\-rebuild")" ] && fn_rebuild_repo && exit 0
+[ -n "$(echo "$@" | grep "\-\-rebuild")" ] \
+    && fn_rebuild_repo && exit 0
 
