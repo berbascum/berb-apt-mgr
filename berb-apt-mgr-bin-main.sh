@@ -273,8 +273,6 @@ fn_gen_Packages() {
 }
 
 fn_gen_Release() {
-    ## Clean cache databases
-    rm  cache/*/*
     for release in ${arr_releases[@]}; do
         ## Set per release apt conf files
         fn_conf_filenames_set
@@ -309,6 +307,8 @@ fn_sign_Release() {
 
 fn_rebuild_repo() {
     if [ -d "pool" ]; then
+        ## Clean cache databases
+        rm -v cache/*/*
         ASK "Rescan and sign the repo? [ y|n ]: "
         [ "${answer}" != "y" ] && exit
         ## Load key-ids
