@@ -297,7 +297,7 @@ fn_rebuild_repo() {
         [ ! -f "key-ids.conf" ] &&  abort "key-ids.conf not found!"
         while read var; do eval ${var}; done < "key-ids.conf"
         ## Rebuild apt repo
-        fn_gen_Packages
+#        fn_gen_Packages
         fn_gen_Release
         fn_sign_Release
 	#
