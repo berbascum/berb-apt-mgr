@@ -22,17 +22,44 @@ Simple bash script to manage a configurable multiarch and multirelease apt repos
 ### version 2.0.2.1-stable
 - Broken: multi-release feature
 
-## Installation
+## Installation from apt repo
 The script can be installed from [berbascum's git apt repo](https://github.com/berbascum/berb-apt-git-repo)
 
 
+## Installation cloning the repo
+* Clone the repo from Github and cd to it
+```
+git clone https://github.com/berbascum/berb-apt-mgr.git && cd berb-apt-mgr
+```
+
+* Copy the app files
+```
+sudo mkdir /etc/berb-apt-mgr /usr/share/berb-apt-mgr
+```
+```
+sudo cp ./pkg_rootfs/usr/bin/berb-apt-mgr /usr/bin
+```
+```
+sudo cp ./pkg_rootfs/etc/berb-apt-mgr/berb-apt-mgr-main.conf /etc/berb-apt-mgr/                   
+```
+```
+sudo cp ./pkg_rootfs/usr/share/berb-apt-mgr/* /usr/share//berb-apt-mgr/
+```
+```
+sudo cp ./pkg_rootfs/usr/share/berb-apt-mgr/* /usr/share//berb-apt-mgr/
+```
+
+* Create the local berb-apt-mgr conf file and configure it
+```
+sudo cp /usr/share/berb-apt-mgr/berb-apt-mgr_template.conf /path/to/apt/repo/berb-apt-mgr.conf
+```
+
+* The files "key-ids.conf" /usr/share/berb-apt-mgr need to be configured and moved to the apt repo rootdir
+```
+cp /usrr/share/berb-apt-mgr/key-ids.conf /path/to/apt/repo/
+```
+
 ## Help
-* This script can be runned from any dir in PATH
-
-* Change to the apt repo dir is needed first
-
-* The files \"key-ids.conf\" and \"berb-apt-mgr.conf\" in /usr/share/berb-apt-mgr need to be configured and moved to the apt repo rootdir
-
 * script tags:
 
   --mkdirs:     Creates the repo dir structure, based on the releases and archs"
