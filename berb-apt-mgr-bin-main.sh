@@ -101,11 +101,11 @@ fn_mkdirs() {
     info "Creating directory structure..."
     ## Create pool dirs
     for release in ${arr_releases[@]}; do
-        mkdir -p -v "archive/dists/${release}/main/source"
-        mkdir -p -v archive/cache/${release}
+        mkdir -p -v "dists/${release}/main/source"
+        mkdir -p -v cache/${release}
         for base_dir in ${arr_base_dirs[@]}; do
             for arch in ${arr_archs[@]}; do
-                mkdir -p -v "archive/${base_dir}/${release}/main/binary-${arch}"
+                mkdir -p -v "${base_dir}/${release}/main/binary-${arch}"
             done
          done
     done
@@ -255,16 +255,16 @@ fn_gen_Packages() {
         for arch in ${arr_archs[@]}; do
 	    dpkg-scanpackages --multiversion \
 	        pool/"${release}"/main/binary-"${arch}" \
-	        > archive/dists/"${release}"/main/binary-"${arch}"/Packages
-            cat archive/dists/${release}/main/binary-"${arch}"/Packages | gzip -9 \
-	        > archive/dists/${release}/main/binary-"${arch}"/Packages.gz
+	        > dists/"${release}"/main/binary-"${arch}"/Packages
+            cat dists/${release}/main/binary-"${arch}"/Packages | gzip -9 \
+	        > dists/${release}/main/binary-"${arch}"/Packages.gz
 	done
     done
 }
 
 fn_gen_Release() {
     ## Clean cache databases
-    rm  archive/cache/*/*
+    rm  cache/*/*
     for release in ${arr_releases[@]}; do
         ## Set per release apt conf files
         fn_conf_filenames_set
@@ -276,7 +276,7 @@ fn_gen_Release() {
 	info "Generating \"Release\" for \"${release}\"..."
         apt-ftparchive release \
 	 -c=${apt_conf_dir}/${aptftp_conf_full_filename} \
-	    archive/dists/${release} >archive/dists/${release}/Release
+	    dists/${release} > dists/${release}/Release
     done
 }
 
@@ -285,9 +285,11 @@ fn_sign_Release() {
         info "Signing \"Release\" for \"${release}\"..."
         ## Sign
         gpg --batch --yes -abs -u "${KEY_LONG}" \
-	    -o archive/dists/${release}/Release.gpg archive/dists/${release}/Release
+	    -o dists/${release}/Release.gpg \
+	    dists/${release}/Release
         gpg --batch --yes -u "${KEY_LONG}" --clear-sign \
-	    --output archive/dists/"${release}"/InRelease archive/dists/"${release}"/Release
+	    --output dists/"${release}"/InRelease \
+	    dists/"${release}"/Release
     done
     ## Next shortest is showed at first ilne  with --list-keys --keyid-format long near 
     info "Exporting \"${gpg_pub_filename}.gpg\"..."
@@ -295,7 +297,7 @@ fn_sign_Release() {
 }
 
 fn_rebuild_repo() {
-    if [ -d "archive/pool" ]; then
+    if [ -d "pool" ]; then
         ASK "Rescan and sign the repo? [ y|n ]: "
         [ "${answer}" != "y" ] && exit
         ## Load key-ids
