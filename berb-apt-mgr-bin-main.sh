@@ -84,15 +84,18 @@ fn_bam_global_conf() {
     ## Config files check
     [ ! -f "${CONF_BERB_REPO_FULLPATH_FILENAME}" ] \
 	&&  abort "${CONF_BERB_REPO_FULLPATH_FILENAME} missing!"
-    [ ! -f "${CONF_MAIN_FULLPATH_FILENAME}" ] &&  abort "\"${CONF_MAIN_FULLPATH_FILENAME}\" missing!"
+    [ ! -f "${CONF_MAIN_FULLPATH_FILENAME}" ] \
+	&&  abort "\"${CONF_MAIN_FULLPATH_FILENAME}\" missing!"
     #
     ## Load global vars section from main config file
     section="global-vars"
-    fn_bbgl_parse_file_section CONF_MAIN "${section}" "load_section"
+    fn_bbgl_parse_file_section CONF_MAIN "${section}" \
+	"load_section"
     #
     ## Load global vars section from main config file
     section="global-vars"
-    fn_bbgl_parse_file_section CONF_BERB_REPO "${section}" "load_section"
+    fn_bbgl_parse_file_section CONF_BERB_REPO "${section}" \
+        "load_section"
 }
 ## Load script global config
 fn_bam_global_conf
@@ -105,7 +108,8 @@ fn_mkdirs() {
         mkdir -p -v cache/${release}
         for base_dir in ${arr_base_dirs[@]}; do
             for arch in ${arr_archs[@]}; do
-                mkdir -p -v "${base_dir}/${release}/main/binary-${arch}"
+                mkdir -p -v \
+		    "${base_dir}/${release}/main/binary-${arch}"
             done
          done
     done
@@ -115,7 +119,8 @@ fn_mkdirs() {
 
 fn_check_templates() {
     for template in ${arr_aptconf_templates[@]}; do
-        [ ! -f "${template}" ] && error "\"${template}\" template not found!"
+        [ ! -f "${template}" ] \
+	    && error "\"${template}\" template not found!"
     done
 }
 
@@ -236,13 +241,18 @@ fn_apt_repo_configs_create() {
     ## Create the apt list from template
     if [ ! -f "${gpg_pub_filename}.list" ]; then
 	info "Creating \"${gpg_pub_filename}.list\"..."
-        cp "${apt_template_list_fullpath_filename}" "${gpg_pub_filename}.list"
-        sed -i "s/REPLACE_ARCHS/${apt_list_archs_list}/g" "${gpg_pub_filename}.list"
-        sed -i "s/REPLACE_FILENAME/${gpg_pub_filename}/g" "${gpg_pub_filename}.list"
-        sed -i "s|REPLACE_URL|${apt_list_url}|g" "${gpg_pub_filename}.list"
+        cp "${apt_template_list_fullpath_filename}" \
+	    "${gpg_pub_filename}.list"
+        sed -i "s/REPLACE_ARCHS/${apt_list_archs_list}/g" \
+	    "${gpg_pub_filename}.list"
+        sed -i "s/REPLACE_FILENAME/${gpg_pub_filename}/g" \
+	    "${gpg_pub_filename}.list"
+        sed -i "s|REPLACE_URL|${apt_list_url}|g" \
+	    "${gpg_pub_filename}.list"
     fi
 }
-[ -n "$(echo "$@" | grep "\-\-createconf")" ] && fn_apt_repo_configs_create && exit 0
+[ -n "$(echo "$@" | grep "\-\-createconf")" ] \
+    && fn_apt_repo_configs_create && exit 0
 
 fn_gen_Packages() {
     ## First copy the debs to pool/<release>/main
@@ -291,7 +301,8 @@ fn_sign_Release() {
 	    --output dists/"${release}"/InRelease \
 	    dists/"${release}"/Release
     done
-    ## Next shortest is showed at first ilne  with --list-keys --keyid-format long near 
+    ## Next shortest is showed at first ilne with 
+    ## --list-keys --keyid-format long near 
     info "Exporting \"${gpg_pub_filename}.gpg\"..."
     gpg --export "${KEY_SHORT}" > ${gpg_pub_filename}.gpg
 }
@@ -301,7 +312,8 @@ fn_rebuild_repo() {
         ASK "Rescan and sign the repo? [ y|n ]: "
         [ "${answer}" != "y" ] && exit
         ## Load key-ids
-        [ ! -f "key-ids.conf" ] &&  abort "key-ids.conf not found!"
+        [ ! -f "key-ids.conf" ] \
+	    &&  abort "key-ids.conf not found!"
         while read var; do eval ${var}; done < "key-ids.conf"
         ## Rebuild apt repo
 #        fn_gen_Packages
@@ -318,5 +330,6 @@ fn_rebuild_repo() {
         git push origin main
     fi
 }
-[ -n "$(echo "$@" | grep "\-\-rebuild")" ] && fn_rebuild_repo && exit 0
+[ -n "$(echo "$@" | grep "\-\-rebuild")" ] \
+    && fn_rebuild_repo && exit 0
 
