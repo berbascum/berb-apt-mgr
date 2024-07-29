@@ -295,7 +295,7 @@ fn_sign_Release() {
 }
 
 fn_rebuild_repo() {
-    if [ -d "pool" ]; then
+    if [ -d "archive/pool" ]; then
         ASK "Rescan and sign the repo? [ y|n ]: "
         [ "${answer}" != "y" ] && exit
         ## Load key-ids
