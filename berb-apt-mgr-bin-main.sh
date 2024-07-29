@@ -101,14 +101,14 @@ fn_mkdirs() {
     info "Creating directory structure..."
     ## Create pool dirs
     for release in ${arr_releases[@]}; do
-        mkdir -p -v "dists/${release}/main/source"
+        mkdir -p -v "archive/dists/${release}/main/source"
+        mkdir -p -v archive/cache/${release}
         for base_dir in ${arr_base_dirs[@]}; do
             for arch in ${arr_archs[@]}; do
-                mkdir -p -v "${base_dir}/${release}/main/binary-${arch}"
+                mkdir -p -v "archive/${base_dir}/${release}/main/binary-${arch}"
             done
          done
     done
-    mkdir -v state cache
 }
 [ -n "$(echo "$@" | grep "\-\-mkdirs")" ] && fn_mkdirs && exit 0
 
@@ -178,6 +178,8 @@ fn_apt_repo_configs_create() {
         ## Create the aptgenerate global shared config
         ## conf file from template, one file per release
         cp -v "${aptgen_templ_file}" \
+	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
+        sed -i "s/REPLACE_RELEASE/${release}/g" \
 	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
         ## Create aptconf BinDir fragments
 	## and merge in aptgenerate.conf
@@ -253,36 +255,39 @@ fn_gen_Packages() {
         for arch in ${arr_archs[@]}; do
 	    dpkg-scanpackages --multiversion \
 	        pool/"${release}"/main/binary-"${arch}" \
-	        > dists/"${release}"/main/binary-"${arch}"/Packages
-            cat dists/${release}/main/binary-"${arch}"/Packages | gzip -9 \
-	        > dists/${release}/main/binary-"${arch}"/Packages.gz
+	        > archive/dists/"${release}"/main/binary-"${arch}"/Packages
+            cat archive/dists/${release}/main/binary-"${arch}"/Packages | gzip -9 \
+	        > archive/dists/${release}/main/binary-"${arch}"/Packages.gz
 	done
     done
 }
 
 fn_gen_Release() {
-    info "Generating \"Release\" files..."
+    ## Clean cache databases
+    rm  archive/cache/*/*
     for release in ${arr_releases[@]}; do
         ## Set per release apt conf files
         fn_conf_filenames_set
         ## Create Releases
+	info "Generating \"metadata\" for \"${release}\"..."
         apt-ftparchive generate \
 	 -c=${apt_conf_dir}/${aptftp_conf_full_filename} \
 	    ${apt_conf_dir}/${aptgen_conf_full_filename}
+	info "Generating \"Release\" for \"${release}\"..."
         apt-ftparchive release \
 	 -c=${apt_conf_dir}/${aptftp_conf_full_filename} \
-	    dists/${release} >dists/${release}/Release
+	    archive/dists/${release} >archive/dists/${release}/Release
     done
 }
 
 fn_sign_Release() {
-    info "Signing \"Release\" files..."
     for release in ${arr_releases[@]}; do
+        info "Signing \"Release\" for \"${release}\"..."
         ## Sign
         gpg --batch --yes -abs -u "${KEY_LONG}" \
-	    -o dists/${release}/Release.gpg dists/${release}/Release
+	    -o archive/dists/${release}/Release.gpg archive/dists/${release}/Release
         gpg --batch --yes -u "${KEY_LONG}" --clear-sign \
-	    --output dists/"${release}"/InRelease dists/"${release}"/Release
+	    --output archive/dists/"${release}"/InRelease archive/dists/"${release}"/Release
     done
     ## Next shortest is showed at first ilne  with --list-keys --keyid-format long near 
     info "Exporting \"${gpg_pub_filename}.gpg\"..."
