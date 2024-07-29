@@ -315,10 +315,15 @@ fn_rebuild_repo() {
 	## Ask to commit and push rebuild changes
         ASK "Want to commit the rebuild? [ y|n ]: "
         [ "${answer}" != "y" ] && exit
+	commit_msg=""
+        ASK "Type a short commit msg or leave empty: "
+        [ -n "${answer}" ] && commit_msg=": ${answer}"
+        ## Add and commit
 	git add cache dists
-	git commit -m "Rebuild repository"
-        ASK "Want to push to origin-main?? [ y|n ]: "
+	git commit -m "Rebuild repository${commit_msg}"
+        ASK "Want to push main to origin? [ y|n ]: "
         [ "${answer}" != "y" ] && exit
+	## Push main to origin
         git push origin main
     fi
 }
