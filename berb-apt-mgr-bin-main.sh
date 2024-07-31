@@ -59,20 +59,6 @@ fn_help() {
 [ -z "$1" -o -n "$(echo "$@" | grep "\-\-help")" ] && fn_help && exit 0
 
 fn_bam_global_conf() {
-    ## Libs path vars
-    LIBS_FULLPATH="/usr/lib/${TOOL_NAME}"
-    ## Templates path vars
-    TEMPLATES_FULLPATH="/usr/share/${TOOL_NAME}"
-    ## Log path vars
-    LOG_FULLPATH="${HOME}/logs/${TOOL_NAME}"
-    ## Set main config file vars
-    CONF_MAIN_FILENAME="${TOOL_NAME}-main.conf"
-    CONF_MAIN_FULLPATH="/etc/${TOOL_NAME}"
-    CONF_MAIN_FULLPATH_FILENAME="${CONF_MAIN_FULLPATH}/${CONF_MAIN_FILENAME}"
-    ## Set berb repo config file vars
-    CONF_BERB_REPO_FILENAME="${TOOL_NAME}.conf"
-    CONF_BERB_REPO_FULLPATH="."
-    CONF_BERB_REPO_FULLPATH_FILENAME="${CONF_BERB_REPO_FULLPATH}/${CONF_BERB_REPO_FILENAME}"
     ## Load libs
     . /usr/lib/berb-bash-libs/bbl_general_lib_${BBL_GENERAL_VERSION}
     #. /usr/lib/berb-bash-libs/bbl_net_lib_${BBL_NET_VERSION}
@@ -82,16 +68,18 @@ fn_bam_global_conf() {
     fn_bbgl_config_log_level $@
     #
     ## TODO: Improve app files check
-    ## Config files check
-    [ ! -f "${CONF_BERB_REPO_FULLPATH_FILENAME}" ] \
-	&&  abort "${CONF_BERB_REPO_FULLPATH_FILENAME} missing!"
-    [ ! -f "${CONF_MAIN_FULLPATH_FILENAME}" ] \
-	&&  abort "\"${CONF_MAIN_FULLPATH_FILENAME}\" missing!"
+    ## Config main file check
+    [ ! -f "/etc/berb-apt-mgr/berb-apt-mgr-main.conf" ] \
+	&&  abort "Main config file not found!"
     #
     ## Load global vars section from main config file
     section="global-vars"
     fn_bbgl_parse_file_section CONF_MAIN "${section}" \
 	"load_section"
+    #
+    ## Config local file check
+    [ ! -f "${CONF_BERB_REPO_FULLPATH_FILENAME}" ] \
+	&&  abort "${CONF_BERB_REPO_FULLPATH_FILENAME} missing!"
     #
     ## Load global vars section from main config file
     section="global-vars"
