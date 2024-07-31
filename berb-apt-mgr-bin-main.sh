@@ -67,8 +67,12 @@ fn_bam_global_conf() {
     ## Config log level
     fn_bbgl_config_log_level $@
     #
+    ## Set main config file vars
+    CONF_MAIN_FILENAME="${TOOL_NAME}-main.conf"
+    CONF_MAIN_FULLPATH="/etc/${TOOL_NAME}"
+    CONF_MAIN_FULLPATH_FILENAME="${CONF_MAIN_FULLPATH}/${CONF_MAIN_FILENAME}"
     ## Config main file check
-    [ ! -f "/etc/berb-apt-mgr/berb-apt-mgr-main.conf" ] \
+    [ ! -f "${CONF_MAIN_FULLPATH_FILENAME}" ] \
 	&&  abort "Main config file not found!"
     ## Load global vars section from main config file
     section="global-vars"
@@ -76,7 +80,7 @@ fn_bam_global_conf() {
 	"load_section"
     #
     ## Templates check
-    [ -n "$(ls  ${TEMPLATES_FULLPATH}/*template.conf 2>/dev/null)" ] \
+    [ -z "$(ls  ${TEMPLATES_FULLPATH}/*template.conf 2>/dev/null)" ] \
        && abort "Template files not found in ${TEMPLATES_FULLPATH}"
     #
     ## Config local repo check install
@@ -92,7 +96,7 @@ fn_bam_global_conf() {
     ## Is configured? Conf local repo
     is_configured=$(cat ./${CONF_BERB_REPO_FILENAME} \
 	    | grep "releases_origin=\"some_origin\"")
-    [ -z "${is_configured}" ] \
+    [ -n "${is_configured}" ] \
 	&& abort "Configure \"./${CONF_BERB_REPO_FILENAME}\" first"
     #
     ## Load global vars section from main config file
