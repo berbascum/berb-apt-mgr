@@ -99,6 +99,11 @@ fn_bam_global_conf() {
     section="global-vars"
     fn_bbgl_parse_file_section CONF_BERB_REPO "${section}" \
         "load_section"
+    #
+    ## Load apt-ftparchive vars section from main conf
+    section="apt-ftparchive"
+    fn_bbgl_parse_file_section CONF_MAIN "${section}" \
+	"load_section"
 }
 ## Load script global config
 fn_bam_global_conf
