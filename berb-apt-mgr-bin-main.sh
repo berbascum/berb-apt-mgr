@@ -295,7 +295,7 @@ fn_sign_Release() {
     ## Next shortest is showed at first ilne with 
     ## --list-keys --keyid-format long near 
     info "Exporting \"${gpg_pub_filename}.gpg\"..."
-    gpg --export "${KEY_SHORT}" > ${gpg_pub_filename}.gpg
+    gpg --export "${KEY_LONG}" > ${gpg_pub_filename}.gpg
 }
 
 fn_rebuild_repo() {
