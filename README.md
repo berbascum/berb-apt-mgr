@@ -27,23 +27,28 @@ Simple bash script to manage a configurable multiarch and multirelease apt repos
 - Broken: multi-release feature
 
 ## Installation from apt repo (recomended way)
-* The script can be installed from [berbascum's git apt repo](https://github.com/berbascum/berb-apt-git-repo)
-
 * It's the recomended way since some depends relies on the debian package management.
 
+* Visit [Berbascum's apt repo url](https://github.com/berbascum/berb-apt-git-repo) to add the apt repo
+
+* Install the pachage from apt
+```
+sudo apt-get install berb-apt-mgr
+```
 
 ## Help
-* The gpg key to use should be previously installed on the user,s gnupg dir
+* The gpg key to use should be previously installed on the user's gnupg dir
 
 * script tags:
 
   --mkdirs:     Creates the repo dir structure, based on the releases and archs"
                 configured in the berb-apt-mgr.conf file"
-                Using the --createconf flag implies interactive optional --mkdirs flag
 
   --rebuild:    Rebuilds the repo"
 
   --createconf: Generates the aptftp.conf and aptgenerate.conf files from"
                 temples using the releases and archs configured in the"
                 berb-apt-mgr.conf file"
+
+                Implies interactive optional --mkdirs
                 
