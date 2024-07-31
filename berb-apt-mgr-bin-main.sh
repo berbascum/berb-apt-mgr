@@ -81,6 +81,7 @@ fn_bam_global_conf() {
     ## Config log level
     fn_bbgl_config_log_level $@
     #
+    ## TODO: Improve app files check
     ## Config files check
     [ ! -f "${CONF_BERB_REPO_FULLPATH_FILENAME}" ] \
 	&&  abort "${CONF_BERB_REPO_FULLPATH_FILENAME} missing!"
@@ -115,14 +116,6 @@ fn_mkdirs() {
     done
 }
 [ -n "$(echo "$@" | grep "\-\-mkdirs")" ] && fn_mkdirs && exit 0
-
-
-fn_check_templates() {
-    for template in ${arr_aptconf_templates[@]}; do
-        [ ! -f "${template}" ] \
-	    && error "\"${template}\" template not found!"
-    done
-}
 
 fn_conf_filenames_set() {
 	## Set aptgen conf file
@@ -173,9 +166,6 @@ fn_apt_repo_configs_create() {
     fi
     #
     fn_get_arch_lists
-    #
-    ## Check for apt-ftp config templates
-    fn_check_templates
     #
     for release in ${arr_releases[@]}; do
 	## Set per release apt conf files
