@@ -67,12 +67,9 @@ fn_bam_global_conf() {
     ## Config log level
     fn_bbgl_config_log_level $@
     #
-    ## TODO: Improve app files check
-    #
     ## Config main file check
     [ ! -f "/etc/berb-apt-mgr/berb-apt-mgr-main.conf" ] \
 	&&  abort "Main config file not found!"
-    #
     ## Load global vars section from main config file
     section="global-vars"
     fn_bbgl_parse_file_section CONF_MAIN "${section}" \
@@ -82,9 +79,21 @@ fn_bam_global_conf() {
     [ -n "$(ls  ${TEMPLATES_FULLPATH}/*template.conf 2>/dev/null)" ] \
        && abort "Template files not found in ${TEMPLATES_FULLPATH}"
     #
-    ## Config local file check
-    [ ! -f "${CONF_BERB_REPO_FULLPATH_FILENAME}" ] \
-	&&  abort "${CONF_BERB_REPO_FULLPATH_FILENAME} missing!"
+    ## Config local repo check install
+    if [ ! -f "${CONF_BERB_REPO_FULLPATH_FILENAME}" ]; then
+       info "Local repo conf file not found"
+       ASK "Want to create it? [ y|n ]: "
+       [ "${answer}" != "y" ] && abort "Aborted by user"
+       ## Create local conf file from template
+       cp -rv \
+	${TEMPLATES_FULLPATH}/${CONF_BERB_REPO_TEMPL_FILENAME} \
+	    ./${CONF_BERB_REPO_FILENAME}
+    fi
+    ## Is configured? Conf local repo
+    is_configured=$(cat ./${CONF_BERB_REPO_FILENAME} \
+	    | grep "releases_origin=\"some_origin\"")
+    [ -z "${is_configured}" ] \
+	&& abort "Configure \"./${CONF_BERB_REPO_FILENAME}\" first"
     #
     ## Load global vars section from main config file
     section="global-vars"
