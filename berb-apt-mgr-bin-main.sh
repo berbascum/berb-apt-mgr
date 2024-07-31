@@ -68,6 +68,7 @@ fn_bam_global_conf() {
     fn_bbgl_config_log_level $@
     #
     ## TODO: Improve app files check
+    #
     ## Config main file check
     [ ! -f "/etc/berb-apt-mgr/berb-apt-mgr-main.conf" ] \
 	&&  abort "Main config file not found!"
@@ -76,6 +77,10 @@ fn_bam_global_conf() {
     section="global-vars"
     fn_bbgl_parse_file_section CONF_MAIN "${section}" \
 	"load_section"
+    #
+    ## Templates check
+    [ -n "$(ls  ${TEMPLATES_FULLPATH}/*template.conf 2>/dev/null)" ] \
+       && abort "Template files not found in ${TEMPLATES_FULLPATH}"
     #
     ## Config local file check
     [ ! -f "${CONF_BERB_REPO_FULLPATH_FILENAME}" ] \
