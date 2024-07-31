@@ -101,8 +101,31 @@ fn_bam_global_conf() {
     #
     ## Load global vars section from main config file
     section="global-vars"
-    fn_bbgl_parse_file_section CONF_BERB_REPO "${section}" \
-        "load_section"
+    fn_bbgl_parse_file_section CONF_BERB_REPO \
+        "${section}" "load_section"
+    #
+    ## Load key-ids.conf
+    if [ ! -f "key-ids.conf" ]; then
+	info "Generating the key-ids.conf file..."
+        KEYID_LONG="$(gpg --list-keys --with-colons \
+	"${gpg_key_username}" | grep "fpr" \
+	| sed 's/fpr//g' | sed 's/://g')"
+        if [ -z "${KEYID_LONG}" ]; then
+	    info "Key not found in the user .gnupg" 
+	    abort "Check gpg username in key-ids.conf"
+	fi
+	## Create key-ids.conf
+	echo "KEYID_LONG=\"${KEYID_LONG}\"" \
+	    > ./key-ids.conf
+        ## Add key-ids.conf to gitignore
+	in_gitignore="$(cat .gitignore 2>/dev/null \
+	    | grep "key-ids.conf")"
+        [ -z "${in_gitignore}" ] \
+	    && echo "key-ids.conf" >> ./.gitignore
+    else
+        while read var; do eval ${var}; \
+            done < "key-ids.conf"
+    fi
     #
     ## Load apt-ftparchive vars section from main conf
     section="apt-ftparchive"
@@ -285,17 +308,17 @@ fn_sign_Release() {
     for release in ${arr_releases[@]}; do
         info "Signing \"Release\" for \"${release}\"..."
         ## Sign
-        gpg --batch --yes -abs -u "${KEY_LONG}" \
+        gpg --batch --yes -abs -u "${KEYID_LONG}" \
 	    -o dists/${release}/Release.gpg \
 	    dists/${release}/Release
-        gpg --batch --yes -u "${KEY_LONG}" --clear-sign \
+        gpg --batch --yes -u "${KEYID_LONG}" --clear-sign \
 	    --output dists/"${release}"/InRelease \
 	    dists/"${release}"/Release
     done
     ## Next shortest is showed at first ilne with 
     ## --list-keys --keyid-format long near 
     info "Exporting \"${gpg_pub_filename}.gpg\"..."
-    gpg --export "${KEY_LONG}" > ${gpg_pub_filename}.gpg
+    gpg --export "${KEYID_LONG}" > ${gpg_pub_filename}.gpg
 }
 
 fn_rebuild_repo() {
@@ -304,10 +327,7 @@ fn_rebuild_repo() {
         rm -v cache/*/*
         ASK "Rescan and sign the repo? [ y|n ]: "
         [ "${answer}" != "y" ] && exit
-        ## Load key-ids
-        [ ! -f "key-ids.conf" ] \
-	    &&  abort "key-ids.conf not found!"
-        while read var; do eval ${var}; done < "key-ids.conf"
+	#
         ## Rebuild apt repo
         fn_gen_Packages
         fn_gen_Release
