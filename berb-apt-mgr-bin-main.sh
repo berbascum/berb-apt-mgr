@@ -282,6 +282,9 @@ fn_apt_repo_configs_create() {
         sed -i "s|REPLACE_URL|${apt_list_url}|g" \
 	    "${gpg_pub_filename}.list"
     fi
+
+    ## Remove fragments dir after merge them
+    rm -r "${apt_conf_dir}"/fragments
 }
 [ -n "$(echo "$@" | grep "\-\-createconf")" ] \
     && fn_apt_repo_configs_create && exit 0
