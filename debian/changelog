@@ -1,3 +1,40 @@
-berb-apt-mgr (2.0.3.1+git20240729202651.780c538.stable) stable; urgency=medium
+berb-apt-mgr (2.0.4.1+git20240731191115.a50b1d5.stable) stable; urgency=medium
 
- -- berbascum <berbascum@ticv.cat>  Mon, 29 Jul 2024 20:26:51 +0200
+  [berbascum]
+  * (a50b1d5) Update pkg_rootfs: update dir before a new build 
+  * (3e2734f) Update version strings 
+  * (7a427f5) Remove template: key-ids.conf template no more needed since now is auto-generated 
+  * (a7162e0) Update doc: install instructions updated in README.md 
+  * (9cdf79a) (createconfig) Update: Remove fragments dir after merge them 
+  * (ae77a73) New: Add a comment on apt config files to add the version user for the configs creation 
+  * (29fe2e7) Update doc: app information in README.md 
+  * (b09b06d) New: key-ids.sh auto-creation 
+  * (3ea4d38) (security): export gpg keyring as LONG id instead SHORT 
+  * (7598b0b) Fix: errors from 005d8c9 and 1f05c38 commits were fixed 
+  * (64b5902) Split config: apt-ftparchive vars splitted to its own section in main conf file 
+  * (1f05c38) New: repo local conf file auto-installation 
+  * (617014f) New: reimplemented check_templates feature with new method 
+  * (005d8c9) Move config: global vars from the main script moved to the main conf file 
+  * (dfbc742) Revision: main config file 
+  * (2705365) Remove feature: fn_check_templates remove as deprecated 
+  * (87755c1) Add comments: berb-apt-mgr_template.conf 
+  * (212dbb6) Update doc: install instructions on README.md 
+  * (20519ce) Build release: pre-configs before building new version 2.0.3.1-stable 
+  * (780c538) Update version strings 
+  * (faa86bd) Update doc: README.md 
+  * (1ef8c0e) New feature: ask for a commit msg before commiting rebuild changes 
+  * (4d3710b) Reuse and enable: fn_gen_Packages from splitting the fn_gen_Release commands 
+  * (41eae42) Remove fn_gen_Packages code since dpkg-scanpackages step is deprecated 
+  * (ca7c336) Move cache dbs clean at begin of fn_rebuild_repo 
+  * (fa9b24d) Improve: after rebuild, git add only cache and dists dirs instead -A 
+  * (5743a2c) Visual sthetic code revision 
+  * (84cc0dc) Revert archive as ArchiveDir since is not configurable as github root http dir. To use it, /archive needs to be added at url end 
+  * (8225e36) Update path to archive rootdir at begin of fn_rebuild_repo 
+  * (98880d9) Split cache dbs and binary dirs tree per release 
+              Set archive/ as ArchiveDir
+  * (6eedc1a) Clean obsolete testing scripts 
+  * (be20917) Use a cache dir instead the root dir 
+  * (0bf9953) Add comment: conf_templates/berb-apt-mgr_template.conf 
+  * (fd7cb9d) Deprecate fn_gen_Packages: step not needed, apt-ftparchive does it 
+
+ -- berbascum <berbascum@ticv.cat>  Wed, 31 Jul 2024 19:11:15 +0200
