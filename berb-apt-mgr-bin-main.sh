@@ -22,12 +22,12 @@ fn_header_info() {
     BIN_SRC_TYPE="bash"
     BIN_SRC_EXT="sh"
     BIN_NAME="berb-apt-mgr"
-    TOOL_VERSION="2.0.3.1"
-    TOOL_RELEASE="stable"
     URGENCY='optional'
     TESTED_BASH_VER='5.2.15'
 }
 TOOL_NAME="berb-apt-mgr"
+TOOL_VERSION="2.0.3.1"
+TOOL_RELEASE="stable"
 BBL_GENERAL_VERSION="1101"
 BBL_NET_VERSION="1001"
 #[HEADER_END]
@@ -208,8 +208,13 @@ fn_apt_repo_configs_create() {
         ## conf file from template, one file per release
         cp -v "${aptgen_templ_file}" \
 	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
+        sed -i "s/REPLACE_TOOL_VERSION/${TOOL_VERSION}/g" \
+	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
+        sed -i "s/REPLACE_TOOL_RELEASE/${TOOL_RELEASE}/g" \
+	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
         sed -i "s/REPLACE_RELEASE/${release}/g" \
 	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
+
         ## Create aptconf BinDir fragments
 	## and merge in aptgenerate.conf
         for arch in ${arr_archs[@]}; do
@@ -244,10 +249,13 @@ fn_apt_repo_configs_create() {
         cat "${aptconf_Tree_frag}" >> \
 	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
         #
-	#
         ## Create the base aptftp config from template
         ## one per release
         cp -v "${aptftp_templ_file}" \
+	    "${apt_conf_dir}/${aptftp_conf_full_filename}"
+        sed -i "s/REPLACE_TOOL_VERSION/${TOOL_VERSION}/g" \
+	    "${apt_conf_dir}/${aptftp_conf_full_filename}"
+        sed -i "s/REPLACE_TOOL_RELEASE/${TOOL_RELEASE}/g" \
 	    "${apt_conf_dir}/${aptftp_conf_full_filename}"
         sed -i "s/REPLACE_RELEASE/${release}/g" \
 	    "${apt_conf_dir}/${aptftp_conf_full_filename}"
