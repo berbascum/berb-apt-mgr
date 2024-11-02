@@ -352,7 +352,7 @@ fn_rebuild_repo() {
         [ -n "${answer}" ] && commit_msg=": ${answer}"
         ## Add and commit
 	git add cache dists
-	git commit -m "Rebuild repository${commit_msg}"
+	git commit -S -m "Rebuild repository${commit_msg}"
         ASK "Want to push main to origin? [ y|n ]: "
         [ "${answer}" != "y" ] && exit
 	## Push main to origin
@@ -361,4 +361,3 @@ fn_rebuild_repo() {
 }
 [ -n "$(echo "$@" | grep "\-\-rebuild")" ] \
     && fn_rebuild_repo && exit 0
-
