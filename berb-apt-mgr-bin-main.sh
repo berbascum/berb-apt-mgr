@@ -32,6 +32,9 @@ BBL_GENERAL_VERSION="1101"
 BBL_NET_VERSION="1001"
 #[HEADER_END]
 
+## Args
+[ -n "$(echo "$@" | grep "\-\-batch")" ] \
+    && BATCH_MODE="True"
 
 ## Help
 fn_help() {
@@ -336,25 +339,37 @@ fn_rebuild_repo() {
     if [ -d "pool" ]; then
         ## Clean cache databases
         rm -v cache/*/*
-        ASK "Rescan and sign the repo? [ y|n ]: "
-        [ "${answer}" != "y" ] && exit
+        if [ "${BATCH_MODE}" != "True" ]; then
+            ASK "Rescan and sign the repo? [ y|n ]: "
+            [ "${answer}" != "y" ] && exit 10
+        fi
 	#
         ## Rebuild apt repo
         fn_gen_Packages
         fn_gen_Release
         fn_sign_Release
 	#
-	## Ask to commit and push rebuild changes
-        ASK "Want to commit the rebuild? [ y|n ]: "
-        [ "${answer}" != "y" ] && exit
-	commit_msg=""
-        ASK "Type a short commit msg or leave empty: "
-        [ -n "${answer}" ] && commit_msg=": ${answer}"
+        ## Default commit msg used for --batch mode
+        commit_msg="Rebuild repository"
+        ## Interactive mode:
+        if [ "${BATCH_MODE}" != "True" ]; then
+	    ## Ask to commit and push rebuild changes
+            ASK "Commit the rebuild? [ y|n ]: "
+            [ "${answer}" != "y" ] && exit 10
+            ## Ask for commit msg suffix
+            ASK "Type a short commit msg or leave empty: "
+            [ -n "${answer}" ] \
+                && commit_msg="${commit_msg}: ${answer}"
+        fi
         ## Add and commit
 	git add cache dists
-	git commit -S -m "Rebuild repository${commit_msg}"
-        ASK "Want to push main to origin? [ y|n ]: "
-        [ "${answer}" != "y" ] && exit
+	git commit -S -m "${commit_msg}"
+        ## Interactive mode:
+        if [ "${BATCH_MODE}" != "True" ]; then
+            ## Ask for push to origin
+            ASK "Want to push main to origin? [ y|n ]: "
+            [ "${answer}" != "y" ] && exit
+        fi
 	## Push main to origin
         git push origin main
     fi
