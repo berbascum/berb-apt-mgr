@@ -1,30 +1,14 @@
-berb-apt-mgr (2.0.5.1+git20241109030634.e4b5455.stable) stable; urgency=medium
+berb-apt-mgr (2.0.6.1+git20241109032425.6302bde.stable) stable; urgency=medium
 
   [berbascum]
+  * (6302bde) (pkg_rootfs) upgrade: dir upgrade to last changes 
+  * (e62bc12) Increase version strings 
+  * (08a9d4f) (script) main: bump to bbl-git v1211 
   * (e4b5455) (depends) control: fix missing commas 
   * (cb76a0a) (pkg_rootfs) upgrade: dir upgrade to last changes 
   * (07e4e9c) Increase version strings 
   * (12c54d1) (script) main: fix missing eval on the GIT_COMMIT_CMD execution line 
   * (2cd34b4) (script) main: bbl-git integration and use the GIT_COMMIT_CMD var 
   * (d8c08b3) (script) main: batch mode for rebuild repository implemented 
-  * (45a8d22) (script) main: enable signing when commiting 
-  * (d0cde69) Build release: pre-configs before building new version 2.0.4.1-stable 
-  * (a50b1d5) Update pkg_rootfs: update dir before a new build 
-  * (3e2734f) Update version strings 
-  * (7a427f5) Remove template: key-ids.conf template no more needed since now is auto-generated 
-  * (a7162e0) Update doc: install instructions updated in README.md 
-  * (9cdf79a) (createconfig) Update: Remove fragments dir after merge them 
-  * (ae77a73) New: Add a comment on apt config files to add the version user for the configs creation 
-  * (29fe2e7) Update doc: app information in README.md 
-  * (b09b06d) New: key-ids.sh auto-creation 
-  * (3ea4d38) (security): export gpg keyring as LONG id instead SHORT 
-  * (7598b0b) Fix: errors from 005d8c9 and 1f05c38 commits were fixed 
-  * (64b5902) Split config: apt-ftparchive vars splitted to its own section in main conf file 
-  * (1f05c38) New: repo local conf file auto-installation 
-  * (617014f) New: reimplemented check_templates feature with new method 
-  * (005d8c9) Move config: global vars from the main script moved to the main conf file 
-  * (dfbc742) Revision: main config file 
-  * (2705365) Remove feature: fn_check_templates remove as deprecated 
-  * (87755c1) Add comments: berb-apt-mgr_template.conf 
 
- -- berbascum <berbascum@ticv.cat>  Sat, 09 Nov 2024 03:06:34 +0100
+ -- berbascum <berbascum@ticv.cat>  Sat, 09 Nov 2024 03:24:25 +0100
