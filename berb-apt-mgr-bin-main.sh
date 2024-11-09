@@ -30,6 +30,7 @@ TOOL_VERSION="2.0.4.1"
 TOOL_RELEASE="stable"
 BBL_GENERAL_VERSION="1101"
 BBL_NET_VERSION="1001"
+BBL_GIT_VERSION="1111"
 #[HEADER_END]
 
 ## Args
@@ -64,6 +65,7 @@ fn_help() {
 fn_bam_global_conf() {
     ## Load libs
     . /usr/lib/berb-bash-libs/bbl_general_lib_${BBL_GENERAL_VERSION}
+    . /usr/lib/berb-bash-libs/bbl_git_lib_${BBL_GIT_VERSION}
     #. /usr/lib/berb-bash-libs/bbl_net_lib_${BBL_NET_VERSION}
     ## Config log
     fn_bbgl_config_log
@@ -363,7 +365,8 @@ fn_rebuild_repo() {
         fi
         ## Add and commit
 	git add cache dists
-	git commit -S -m "${commit_msg}"
+        fn_bblgit_check_if_can_sign
+        "${GIT_COMMIT_CMD}"
         ## Interactive mode:
         if [ "${BATCH_MODE}" != "True" ]; then
             ## Ask for push to origin
