@@ -1,6 +1,14 @@
-berb-apt-mgr (2.0.4.1+git20240731191115.a50b1d5.stable) stable; urgency=medium
+berb-apt-mgr (2.0.5.1+git20241109030634.e4b5455.stable) stable; urgency=medium
 
   [berbascum]
+  * (e4b5455) (depends) control: fix missing commas 
+  * (cb76a0a) (pkg_rootfs) upgrade: dir upgrade to last changes 
+  * (07e4e9c) Increase version strings 
+  * (12c54d1) (script) main: fix missing eval on the GIT_COMMIT_CMD execution line 
+  * (2cd34b4) (script) main: bbl-git integration and use the GIT_COMMIT_CMD var 
+  * (d8c08b3) (script) main: batch mode for rebuild repository implemented 
+  * (45a8d22) (script) main: enable signing when commiting 
+  * (d0cde69) Build release: pre-configs before building new version 2.0.4.1-stable 
   * (a50b1d5) Update pkg_rootfs: update dir before a new build 
   * (3e2734f) Update version strings 
   * (7a427f5) Remove template: key-ids.conf template no more needed since now is auto-generated 
@@ -18,23 +26,5 @@ berb-apt-mgr (2.0.4.1+git20240731191115.a50b1d5.stable) stable; urgency=medium
   * (dfbc742) Revision: main config file 
   * (2705365) Remove feature: fn_check_templates remove as deprecated 
   * (87755c1) Add comments: berb-apt-mgr_template.conf 
-  * (212dbb6) Update doc: install instructions on README.md 
-  * (20519ce) Build release: pre-configs before building new version 2.0.3.1-stable 
-  * (780c538) Update version strings 
-  * (faa86bd) Update doc: README.md 
-  * (1ef8c0e) New feature: ask for a commit msg before commiting rebuild changes 
-  * (4d3710b) Reuse and enable: fn_gen_Packages from splitting the fn_gen_Release commands 
-  * (41eae42) Remove fn_gen_Packages code since dpkg-scanpackages step is deprecated 
-  * (ca7c336) Move cache dbs clean at begin of fn_rebuild_repo 
-  * (fa9b24d) Improve: after rebuild, git add only cache and dists dirs instead -A 
-  * (5743a2c) Visual sthetic code revision 
-  * (84cc0dc) Revert archive as ArchiveDir since is not configurable as github root http dir. To use it, /archive needs to be added at url end 
-  * (8225e36) Update path to archive rootdir at begin of fn_rebuild_repo 
-  * (98880d9) Split cache dbs and binary dirs tree per release 
-              Set archive/ as ArchiveDir
-  * (6eedc1a) Clean obsolete testing scripts 
-  * (be20917) Use a cache dir instead the root dir 
-  * (0bf9953) Add comment: conf_templates/berb-apt-mgr_template.conf 
-  * (fd7cb9d) Deprecate fn_gen_Packages: step not needed, apt-ftparchive does it 
 
- -- berbascum <berbascum@ticv.cat>  Wed, 31 Jul 2024 19:11:15 +0200
+ -- berbascum <berbascum@ticv.cat>  Sat, 09 Nov 2024 03:06:34 +0100
