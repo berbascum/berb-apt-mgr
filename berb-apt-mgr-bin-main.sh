@@ -76,15 +76,15 @@ fn_get_gpg_keyid() {
 	## Create key-ids.conf
 	echo "GPG_KEY_ID=\"${GPG_KEY_ID}\"" \
 	    > ./key-ids.conf
-        ## Add key-ids.conf to gitignore
-	in_gitignore="$(cat .gitignore 2>/dev/null \
-	    | grep "key-ids.conf")"
-        [ -z "${in_gitignore}" ] \
-	    && echo "key-ids.conf" >> ./.gitignore
-    else
-        while read var; do eval ${var}; \
-            done < "key-ids.conf"
     fi
+    ## Add key-ids.conf to gitignore
+    chmod 400 ./key-ids.conf
+    in_gitignore="$(cat .gitignore 2>/dev/null \
+        | grep "key-ids.conf")"
+    [ -z "${in_gitignore}" ] \
+        && echo "key-ids.conf" >> ./.gitignore
+    ## Load vars from key-ids.conf
+    while read var; do eval ${var}; done < "key-ids.conf"
 }
 
 fn_bam_global_conf() {
@@ -134,7 +134,7 @@ fn_bam_global_conf() {
     fn_bbgl_parse_file_section CONF_BERB_REPO \
         "${section}" "load_section"
     #
-    [ -z "${GPG_KEY_ID}" ] && fn_get_gpg_keyid
+    fn_get_gpg_keyid
     #
     ## Load apt-ftparchive vars section from main conf
     section="apt-ftparchive"
