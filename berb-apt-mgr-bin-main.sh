@@ -326,9 +326,8 @@ fn_gen_Release() {
 }
 
 fn_sign_Release() {
-    set -x
     for release in ${arr_releases[@]}; do
-        info "Signing \"Release\" for \"${release}\" with keyid \"${gpg_key_id}\"..."
+        info "Signing \"Release\" for \"${release}\"..."
         ## Sign
         gpg --batch --yes --debug-level advanced --passphrase "${GPG_PASSPHRASE}" -abs -u "${gpg_key_id}" \
 	    -o dists/${release}/Release.gpg \
