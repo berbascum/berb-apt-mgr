@@ -62,6 +62,31 @@ fn_help() {
 }
 [ -z "$1" -o -n "$(echo "$@" | grep "\-\-help")" ] && fn_help && exit 0
 
+fn_get_gpg_keyid() {
+    ## Load key-ids.conf
+    if [ ! -f "key-ids.conf" ]; then
+	info "Generating the key-ids.conf file..."
+        GPG_KEY_ID="$(gpg --list-keys --with-colons \
+	"${gpg_key_username}" | grep "fpr" \
+	| sed 's/fpr//g' | sed 's/://g')"
+        if [ -z "${GPG_KEY_ID}" ]; then
+	    info "Key not found in the user .gnupg"
+	    abort "Check gpg username in key-ids.conf"
+	fi
+	## Create key-ids.conf
+	echo "GPG_KEY_ID=\"${GPG_KEY_ID}\"" \
+	    > ./key-ids.conf
+        ## Add key-ids.conf to gitignore
+	in_gitignore="$(cat .gitignore 2>/dev/null \
+	    | grep "key-ids.conf")"
+        [ -z "${in_gitignore}" ] \
+	    && echo "key-ids.conf" >> ./.gitignore
+    else
+        while read var; do eval ${var}; \
+            done < "key-ids.conf"
+    fi
+}
+
 fn_bam_global_conf() {
     ## Load libs
     source /usr/lib/berb-bash-libs/bbl_general_lib_${BBL_GENERAL_VERSION}
@@ -109,28 +134,7 @@ fn_bam_global_conf() {
     fn_bbgl_parse_file_section CONF_BERB_REPO \
         "${section}" "load_section"
     #
-    ## Load key-ids.conf
-    if [ ! -f "key-ids.conf" ]; then
-	info "Generating the key-ids.conf file..."
-        KEYID_LONG="$(gpg --list-keys --with-colons \
-	"${gpg_key_username}" | grep "fpr" \
-	| sed 's/fpr//g' | sed 's/://g')"
-        if [ -z "${KEYID_LONG}" ]; then
-	    info "Key not found in the user .gnupg" 
-	    abort "Check gpg username in key-ids.conf"
-	fi
-	## Create key-ids.conf
-	echo "KEYID_LONG=\"${KEYID_LONG}\"" \
-	    > ./key-ids.conf
-        ## Add key-ids.conf to gitignore
-	in_gitignore="$(cat .gitignore 2>/dev/null \
-	    | grep "key-ids.conf")"
-        [ -z "${in_gitignore}" ] \
-	    && echo "key-ids.conf" >> ./.gitignore
-    else
-        while read var; do eval ${var}; \
-            done < "key-ids.conf"
-    fi
+    [ -z "${GPG_KEY_ID}" ] && fn_get_gpg_keyid
     #
     ## Load apt-ftparchive vars section from main conf
     section="apt-ftparchive"
@@ -324,17 +328,17 @@ fn_sign_Release() {
     for release in ${arr_releases[@]}; do
         info "Signing \"Release\" for \"${release}\"..."
         ## Sign
-        gpg --batch --yes -abs -u "${KEYID_LONG}" \
+        gpg --batch --yes -abs -u "${GPG_KEY_ID}" \
 	    -o dists/${release}/Release.gpg \
 	    dists/${release}/Release
-        gpg --batch --yes -u "${KEYID_LONG}" --clear-sign \
+        gpg --batch --yes -u "${GPG_KEY_ID}" --clear-sign \
 	    --output dists/"${release}"/InRelease \
 	    dists/"${release}"/Release
     done
     ## Next shortest is showed at first ilne with 
     ## --list-keys --keyid-format long near 
     info "Exporting \"${gpg_pub_filename}.gpg\"..."
-    gpg --export "${KEYID_LONG}" > ${gpg_pub_filename}.gpg
+    gpg --export "${GPG_KEY_ID}" > ${gpg_pub_filename}.gpg
 }
 
 fn_rebuild_repo() {
