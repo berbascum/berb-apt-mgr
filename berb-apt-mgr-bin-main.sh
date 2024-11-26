@@ -386,10 +386,8 @@ fn_rebuild_repo() {
         fn_gen_Packages
         fn_gen_Release
         fn_sign_Release
-        [ -n "$(echo "$@" | grep "\-\-pubkey-export")" ] \
-            && fn_gpg_pubkey_export
-        [ -n "$(echo "$@" | grep "\-\-commit")" ] \
-            && fn_commit_changes
+        [ -z "$(echo "$@" | grep "\-\-pubkey-export")" ] || fn_gpg_pubkey_export
+        [ -z "$(echo "$@" | grep "\-\-commit")" ] || fn_commit_changes
     fi
 }
 [ -n "$(echo "$@" | grep "\-\-rebuild")" ] \
