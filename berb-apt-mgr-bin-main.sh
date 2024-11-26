@@ -338,8 +338,6 @@ fn_sign_Release() {
     done
     ## Next shortest is showed at first ilne with 
     ## --list-keys --keyid-format long near 
-    info "Exporting \"${gpg_pub_filename}.gpg\"..."
-    gpg --export "${gpg_key_id}" > ${gpg_pub_filename}.gpg
 }
 
 fn_commit_changes() {
@@ -370,6 +368,11 @@ fn_commit_changes() {
         git push origin main
 }
 
+fn_gpg_pubkey_export() {
+    info "Exporting \"${gpg_pub_filename}.gpg\"..."
+    gpg --export "${gpg_key_id}" > ${gpg_pub_filename}.gpg
+}
+
 fn_rebuild_repo() {
     if [ -d "pool" ]; then
         if [ "${BATCH_MODE}" != "True" ]; then
@@ -382,6 +385,8 @@ fn_rebuild_repo() {
         fn_gen_Packages
         fn_gen_Release
         fn_sign_Release
+        [ -n "$(echo "$@" | grep "\-\-pubkey-export")" ] \
+            && fn_gpg_pubkey_export
         [ -n "$(echo "$@" | grep "\-\-commit")" ] \
             && fn_commit_changes
     fi
