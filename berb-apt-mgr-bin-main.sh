@@ -329,10 +329,10 @@ fn_sign_Release() {
     for release in ${arr_releases[@]}; do
         info "Signing \"Release\" for \"${release}\" with keyid \"${gpg_key_id}\"..."
         ## Sign
-        gpg --batch --yes -abs -u "${gpg_key_id}" \
+        gpg --batch --yes --passphrase "${GPG_PASSPHRASE}" -abs -u "${gpg_key_id}" \
 	    -o dists/${release}/Release.gpg \
 	    dists/${release}/Release
-        gpg --batch --yes -u "${gpg_key_id}" --clear-sign \
+        gpg --batch --yes --passphrase "${GPG_PASSPHRASE}" -u "${gpg_key_id}" --clear-sign \
 	    --output dists/"${release}"/InRelease \
 	    dists/"${release}"/Release
     done
