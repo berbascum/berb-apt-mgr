@@ -1,11 +1,11 @@
-berb-apt-mgr (2.0.9.1+git20241126204432.e410cb6.stable) stable; urgency=medium
+berb-apt-mgr (2.0.9.2+git20241126205645.1999bcf.stable) stable; urgency=medium
 
   [berbascum]
+  * (1999bcf) (pkg_rootfs) upgrade: dir upgrade to last changes 
+  * (62bbff7) (script) main: fix missing script args when calling the rebuild function 
+  * (b6464ca) Start version 2.0.9.2 
+  * (62f6c7a) Build release: pre-configs before building new version 2.0.9.1-stable 
   * (e410cb6) (pkg_rootfs) upgrade: dir upgrade to last changes 
   * (91fb1fe) (script) main: split the rebuild and commit code in different functions for github action compatibility 
-  * (8225261) Start version 2.0.9.1 
-  * (fcdfc7c) Build release: pre-configs before building new version 2.0.8.1-stable 
-  * (944bde1) Close version 2.0.8.1 
-  * (1a6afda) (script) main: split the get keyid code to it's own function and exec only if GPG_KEY_ID is not defined 
 
- -- berbascum <berbascum@ticv.cat>  Tue, 26 Nov 2024 20:44:32 +0100
+ -- berbascum <berbascum@ticv.cat>  Tue, 26 Nov 2024 20:56:45 +0100
