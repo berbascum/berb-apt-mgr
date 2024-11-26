@@ -26,7 +26,7 @@ fn_header_info() {
     TESTED_BASH_VER='5.2.15'
 }
 TOOL_NAME="berb-apt-mgr"
-TOOL_VERSION="2.0.8.1"
+TOOL_VERSION="2.0.9.1"
 TOOL_RELEASE="stable"
 BBL_GENERAL_VERSION="1101"
 BBL_NET_VERSION="1001"
@@ -341,19 +341,7 @@ fn_sign_Release() {
     gpg --export "${GPG_KEY_ID}" > ${gpg_pub_filename}.gpg
 }
 
-fn_rebuild_repo() {
-    if [ -d "pool" ]; then
-        if [ "${BATCH_MODE}" != "True" ]; then
-            ASK "Rescan and sign the repo? [ y|n ]: "
-            [ "${answer}" != "y" ] && exit 10
-        fi
-        ## Clean cache databases
-        rm -v cache/*/*
-	#
-        ## Rebuild apt repo
-        fn_gen_Packages
-        fn_gen_Release
-        fn_sign_Release
+fn_commit_changes() {
 	#
         ## Default commit msg used for --batch mode
         commit_msg="Rebuild repository"
@@ -379,6 +367,22 @@ fn_rebuild_repo() {
         fi
 	## Push main to origin
         git push origin main
+}
+
+fn_rebuild_repo() {
+    if [ -d "pool" ]; then
+        if [ "${BATCH_MODE}" != "True" ]; then
+            ASK "Rescan and sign the repo? [ y|n ]: "
+            [ "${answer}" != "y" ] && exit 10
+        fi
+        ## Clean cache databases
+        rm -v cache/*/*
+        ## Rebuild apt repo
+        fn_gen_Packages
+        fn_gen_Release
+        fn_sign_Release
+        [ -n "$(echo "$@" | grep "\-\-commit")" ] \
+            && fn_commit_changes
     fi
 }
 [ -n "$(echo "$@" | grep "\-\-rebuild")" ] \
