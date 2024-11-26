@@ -67,15 +67,15 @@ fn_get_gpg_keyid() {
     ## Load key-ids.conf
     if [ ! -f "key-ids.conf" ]; then
 	info "Generating the key-ids.conf file..."
-        GPG_KEY_ID="$(gpg --list-keys --with-colons \
+        gpg_key_id="$(gpg --list-keys --with-colons \
 	"${gpg_key_username}" | grep "fpr" \
 	| sed 's/fpr//g' | sed 's/://g')"
-        if [ -z "${GPG_KEY_ID}" ]; then
+        if [ -z "${gpg_key_id}" ]; then
 	    info "Key not found in the user .gnupg"
 	    abort "Check gpg username in key-ids.conf"
 	fi
 	## Create key-ids.conf
-	echo "GPG_KEY_ID=\"${GPG_KEY_ID}\"" \
+	echo "gpg_key_id=\"${gpg_key_id}\"" \
 	    > ./key-ids.conf
     fi
     ## Add key-ids.conf to gitignore
@@ -327,19 +327,19 @@ fn_gen_Release() {
 
 fn_sign_Release() {
     for release in ${arr_releases[@]}; do
-        info "Signing \"Release\" for \"${release}\" with keyid \"${GPG_KEY_ID}\"..."
+        info "Signing \"Release\" for \"${release}\" with keyid \"${gpg_key_id}\"..."
         ## Sign
-        gpg --batch --yes -abs -u "${GPG_KEY_ID}" \
+        gpg --batch --yes -abs -u "${gpg_key_id}" \
 	    -o dists/${release}/Release.gpg \
 	    dists/${release}/Release
-        gpg --batch --yes -u "${GPG_KEY_ID}" --clear-sign \
+        gpg --batch --yes -u "${gpg_key_id}" --clear-sign \
 	    --output dists/"${release}"/InRelease \
 	    dists/"${release}"/Release
     done
     ## Next shortest is showed at first ilne with 
     ## --list-keys --keyid-format long near 
     info "Exporting \"${gpg_pub_filename}.gpg\"..."
-    gpg --export "${GPG_KEY_ID}" > ${gpg_pub_filename}.gpg
+    gpg --export "${gpg_key_id}" > ${gpg_pub_filename}.gpg
 }
 
 fn_commit_changes() {
