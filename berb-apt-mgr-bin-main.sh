@@ -63,6 +63,7 @@ fn_help() {
 [ -z "$1" -o -n "$(echo "$@" | grep "\-\-help")" ] && fn_help && exit 0
 
 fn_get_gpg_keyid() {
+    info "Checking the key-ids.conf file..."
     ## Load key-ids.conf
     if [ ! -f "key-ids.conf" ]; then
 	info "Generating the key-ids.conf file..."
@@ -78,12 +79,12 @@ fn_get_gpg_keyid() {
 	    > ./key-ids.conf
     fi
     ## Add key-ids.conf to gitignore
-    chmod 400 ./key-ids.conf
     in_gitignore="$(cat .gitignore 2>/dev/null \
         | grep "key-ids.conf")"
     [ -z "${in_gitignore}" ] \
         && echo "key-ids.conf" >> ./.gitignore
     ## Load vars from key-ids.conf
+    info "Loading the key-ids.conf file..."
     while read var; do eval ${var}; done < "key-ids.conf"
 }
 
@@ -326,7 +327,7 @@ fn_gen_Release() {
 
 fn_sign_Release() {
     for release in ${arr_releases[@]}; do
-        info "Signing \"Release\" for \"${release}\"..."
+        info "Signing \"Release\" for \"${release}\" with keyid \"${GPG_KEY_ID}\"..."
         ## Sign
         gpg --batch --yes -abs -u "${GPG_KEY_ID}" \
 	    -o dists/${release}/Release.gpg \
