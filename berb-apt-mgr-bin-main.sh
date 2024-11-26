@@ -339,12 +339,12 @@ fn_sign_Release() {
 
 fn_rebuild_repo() {
     if [ -d "pool" ]; then
-        ## Clean cache databases
-        rm -v cache/*/*
         if [ "${BATCH_MODE}" != "True" ]; then
             ASK "Rescan and sign the repo? [ y|n ]: "
             [ "${answer}" != "y" ] && exit 10
         fi
+        ## Clean cache databases
+        rm -v cache/*/*
 	#
         ## Rebuild apt repo
         fn_gen_Packages
