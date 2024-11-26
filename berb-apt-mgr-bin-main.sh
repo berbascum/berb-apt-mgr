@@ -386,4 +386,4 @@ fn_rebuild_repo() {
     fi
 }
 [ -n "$(echo "$@" | grep "\-\-rebuild")" ] \
-    && fn_rebuild_repo && exit 0
+    && fn_rebuild_repo $@ && exit 0
