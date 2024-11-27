@@ -26,7 +26,7 @@ fn_header_info() {
     TESTED_BASH_VER='5.2.15'
 }
 TOOL_NAME="berb-apt-mgr"
-TOOL_VERSION="2.0.9.2"
+TOOL_VERSION="2.0.9.3"
 TOOL_RELEASE="stable"
 BBL_GENERAL_VERSION="1101"
 BBL_NET_VERSION="1001"
@@ -63,28 +63,29 @@ fn_help() {
 [ -z "$1" -o -n "$(echo "$@" | grep "\-\-help")" ] && fn_help && exit 0
 
 fn_get_gpg_keyid() {
+    info "Checking the key-ids.conf file..."
     ## Load key-ids.conf
     if [ ! -f "key-ids.conf" ]; then
 	info "Generating the key-ids.conf file..."
-        GPG_KEY_ID="$(gpg --list-keys --with-colons \
+        gpg_key_id="$(gpg --list-keys --with-colons \
 	"${gpg_key_username}" | grep "fpr" \
 	| sed 's/fpr//g' | sed 's/://g')"
-        if [ -z "${GPG_KEY_ID}" ]; then
+        if [ -z "${gpg_key_id}" ]; then
 	    info "Key not found in the user .gnupg"
 	    abort "Check gpg username in key-ids.conf"
 	fi
 	## Create key-ids.conf
-	echo "GPG_KEY_ID=\"${GPG_KEY_ID}\"" \
+	echo "gpg_key_id=\"${gpg_key_id}\"" \
 	    > ./key-ids.conf
-        ## Add key-ids.conf to gitignore
-	in_gitignore="$(cat .gitignore 2>/dev/null \
-	    | grep "key-ids.conf")"
-        [ -z "${in_gitignore}" ] \
-	    && echo "key-ids.conf" >> ./.gitignore
-    else
-        while read var; do eval ${var}; \
-            done < "key-ids.conf"
     fi
+    ## Add key-ids.conf to gitignore
+    in_gitignore="$(cat .gitignore 2>/dev/null \
+        | grep "key-ids.conf")"
+    [ -z "${in_gitignore}" ] \
+        && echo "key-ids.conf" >> ./.gitignore
+    ## Load vars from key-ids.conf
+    info "Loading the key-ids.conf file..."
+    while read var; do eval ${var}; done < "key-ids.conf"
 }
 
 fn_bam_global_conf() {
@@ -134,7 +135,7 @@ fn_bam_global_conf() {
     fn_bbgl_parse_file_section CONF_BERB_REPO \
         "${section}" "load_section"
     #
-    [ -z "${GPG_KEY_ID}" ] && fn_get_gpg_keyid
+    fn_get_gpg_keyid
     #
     ## Load apt-ftparchive vars section from main conf
     section="apt-ftparchive"
@@ -327,18 +328,18 @@ fn_gen_Release() {
 fn_sign_Release() {
     for release in ${arr_releases[@]}; do
         info "Signing \"Release\" for \"${release}\"..."
-        ## Sign
-        gpg --batch --yes -abs -u "${GPG_KEY_ID}" \
-	    -o dists/${release}/Release.gpg \
-	    dists/${release}/Release
-        gpg --batch --yes -u "${GPG_KEY_ID}" --clear-sign \
-	    --output dists/"${release}"/InRelease \
-	    dists/"${release}"/Release
+        if [ "${SCRIPT_CALLER}" == "github" ]; then
+            ## Sign
+            gpg --batch --yes --debug-level advanced --passphrase "${GPG_PASSPHRASE}" -abs -u "${gpg_key_id}" -o dists/${release}/Release.gpg dists/${release}/Release
+        gpg --batch --yes --debug-level advanced --passphrase "${GPG_PASSPHRASE}" -u "${gpg_key_id}" --clear-sign --output dists/"${release}"/InRelease dists/"${release}"/Release
+        else
+            ## Sign
+            gpg --batch --yes --debug-level advanced -abs -u "${gpg_key_id}" -o dists/${release}/Release.gpg dists/${release}/Release
+            gpg --batch --yes --debug-level advanced -u "${gpg_key_id}" --clear-sign --output dists/"${release}"/InRelease dists/"${release}"/Release
+        fi
     done
     ## Next shortest is showed at first ilne with 
     ## --list-keys --keyid-format long near 
-    info "Exporting \"${gpg_pub_filename}.gpg\"..."
-    gpg --export "${GPG_KEY_ID}" > ${gpg_pub_filename}.gpg
 }
 
 fn_commit_changes() {
@@ -369,6 +370,11 @@ fn_commit_changes() {
         git push origin main
 }
 
+fn_gpg_pubkey_export() {
+    info "Exporting \"${gpg_pub_filename}.gpg\"..."
+    gpg --export "${gpg_key_id}" > ${gpg_pub_filename}.gpg
+}
+
 fn_rebuild_repo() {
     if [ -d "pool" ]; then
         if [ "${BATCH_MODE}" != "True" ]; then
@@ -381,8 +387,8 @@ fn_rebuild_repo() {
         fn_gen_Packages
         fn_gen_Release
         fn_sign_Release
-        [ -n "$(echo "$@" | grep "\-\-commit")" ] \
-            && fn_commit_changes
+        [ -z "$(echo "$@" | grep "\-\-pubkey-export")" ] || fn_gpg_pubkey_export
+        [ -z "$(echo "$@" | grep "\-\-commit")" ] || fn_commit_changes
     fi
 }
 [ -n "$(echo "$@" | grep "\-\-rebuild")" ] \
