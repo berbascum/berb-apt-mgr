@@ -328,13 +328,16 @@ fn_gen_Release() {
 fn_sign_Release() {
     for release in ${arr_releases[@]}; do
         info "Signing \"Release\" for \"${release}\"..."
-        ## Sign
-        gpg --batch --yes --debug-level advanced --passphrase "${GPG_PASSPHRASE}" -abs -u "${gpg_key_id}" \
-	    -o dists/${release}/Release.gpg \
-	    dists/${release}/Release
-        gpg --batch --yes --debug-level advanced --passphrase "${GPG_PASSPHRASE}" -u "${gpg_key_id}" --clear-sign \
-	    --output dists/"${release}"/InRelease \
-	    dists/"${release}"/Release
+        if [ "${SCRIPT_CALLER}" == "github" ]; then
+            GPG_PASSPHRASE_ARG=""
+            ## Sign
+            gpg --batch --yes --debug-level advanced --passphrase "${GPG_PASSPHRASE}" -abs -u "${gpg_key_id}" -o dists/${release}/Release.gpg dists/${release}/Release
+        gpg --batch --yes --debug-level advanced --passphrase "${GPG_PASSPHRASE}" -u "${gpg_key_id}" --clear-sign --output dists/"${release}"/InRelease dists/"${release}"/Release
+        else
+            ## Sign
+            gpg --batch --yes --debug-level advanced -abs -u "${gpg_key_id}" -o dists/${release}/Release.gpg dists/${release}/Release
+            gpg --batch --yes --debug-level advanced -u "${gpg_key_id}" --clear-sign --output dists/"${release}"/InRelease dists/"${release}"/Release
+        fi
     done
     ## Next shortest is showed at first ilne with 
     ## --list-keys --keyid-format long near 
