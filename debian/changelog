@@ -1,6 +1,12 @@
-berb-apt-mgr (2.0.9.3+git20241127081900.8954134.stable) stable; urgency=medium
+berb-apt-mgr (2.0.9.4+git20250103025749.d284a13.stable) stable; urgency=medium
 
   [berbascum]
+  * (d284a13) (gitignore) skip: bdm-build.conf 
+  * (6c667c5) (pkg_rootfs) upgrade: dir upgrade to the latest changes 
+  * (9edd53a) (tools) script: new: for update the baptm files on the pkg_rootfs 
+  * (c22acb9) Increase version strings 
+  * (de2aa4b) (depends) bbl-git: bump to 1231 
+  * (ee8dad3) Build release: pre-configs before building new version 2.0.9.3-stable 
   * (8954134) (pkg_rootfs) upgrade: dir upgrade to last changes 
   * (ff85fe8) (script) main: clear unused var 
   * (dd96048) (script) main: automate the gpg key passphrase for the github actions 
@@ -13,9 +19,5 @@ berb-apt-mgr (2.0.9.3+git20241127081900.8954134.stable) stable; urgency=medium
   * (ebf4cac) (script) main: rename GPG_KEY_ID var name to lowercase 
   * (28035aa) (script) main: add sign Release related debug 
   * (b14a959) (script) main: remmove condition when fn_get_gpg_keyid call 
-  * (6ce9850) Start version 2.0.9.3 
-  * (999fb96) Build release: pre-configs before building new version 2.0.9.2-stable 
-  * (1999bcf) (pkg_rootfs) upgrade: dir upgrade to last changes 
-  * (62bbff7) (script) main: fix missing script args when calling the rebuild function 
 
- -- berbascum <berbascum@ticv.cat>  Wed, 27 Nov 2024 08:19:00 +0100
+ -- berbascum <berbascum@ticv.cat>  Fri, 03 Jan 2025 02:57:49 +0100
