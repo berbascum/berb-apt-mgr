@@ -4,3 +4,4 @@ debian/berb-apt-mgr
 debian/debhelper-build-stamp
 debian/files
 out-berb-apt-mgr
+bdm-build.conf
