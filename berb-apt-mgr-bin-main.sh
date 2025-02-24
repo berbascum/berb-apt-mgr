@@ -233,9 +233,13 @@ fn_apt_repo_configs_create() {
     ## Check for apt-ftp config s dir
     ASK "Any previous aptftp and aptgenerate conf files will be removed. Are you sure? [ y|n ]: "
     [ "${answer}" != "y" ] && abort "Aborted by user"
+    if [ -d "${apt_conf_dir}" ]; then
+	rm -fv ${apt_conf_dir}/*.conf #2>/dev/null
+    else
+        mkdir -p -v "${apt_conf_dir}"
+    fi
     if [ -d "${apt_conf_dir}/fragments" ]; then
-	rm ${apt_conf_dir}/*.conf 2>/dev/null
-	rm ${apt_conf_dir}/fragments/* 2>/dev/null
+	rm -fv ${apt_conf_dir}/fragments/* #2>/dev/null
     else
         mkdir -p -v "${apt_conf_dir}"/fragments
     fi
