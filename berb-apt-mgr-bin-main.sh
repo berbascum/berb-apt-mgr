@@ -149,12 +149,18 @@ fn_mkdirs() {
     info "Creating directory structure..."
     ## Create pool dirs
     for release in ${arr_releases[@]}; do
-        mkdir -p -v "dists/${release}/main/source"
-        mkdir -p -v cache/${release}
+	for component in ${arr_components[@]}; do
+	    dir="dists/${release}/${component}/source"
+            [ -d "${dir}" ] || mkdir -p -v "${dir}"
+	    dir="cache/${release}/${component}"
+            [ -d "${dir}" ] || mkdir -p -v "${dir}"
+        done
         for base_dir in ${arr_base_dirs[@]}; do
             for arch in ${arr_archs[@]}; do
-                mkdir -p -v \
-		    "${base_dir}/${release}/main/binary-${arch}"
+	        for component in ${arr_components[@]}; do
+	    dir="${base_dir}/${release}/${component}/binary-${arch}"
+            [ -d "${dir}" ] || mkdir -p -v "${dir}"
+		done
             done
          done
     done
