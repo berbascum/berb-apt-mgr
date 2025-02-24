@@ -151,15 +151,21 @@ fn_mkdirs() {
     for release in ${arr_releases[@]}; do
 	for component in ${arr_components[@]}; do
 	    dir="dists/${release}/${component}/source"
-            [ -d "${dir}" ] || mkdir -p -v "${dir}"
+            [ -d "${dir}" ] || (mkdir -p -v "${dir}" \
+		&& echo "## Ensure tree integrity" \
+		> "${dir}/dummy")
 	    dir="cache/${release}/${component}"
-            [ -d "${dir}" ] || mkdir -p -v "${dir}"
+            [ -d "${dir}" ] || (mkdir -p -v "${dir}" \
+		&& echo "## Ensure tree integrity" \
+		> "${dir}/dummy")
         done
         for base_dir in ${arr_base_dirs[@]}; do
             for arch in ${arr_archs[@]}; do
 	        for component in ${arr_components[@]}; do
-	    dir="${base_dir}/${release}/${component}/binary-${arch}"
-            [ -d "${dir}" ] || mkdir -p -v "${dir}"
+	            dir="${base_dir}/${release}/${component}/binary-${arch}"
+                    [ -d "${dir}" ] || (mkdir -p -v "${dir}" \
+		    && echo "## Ensure tree integrity" \
+		    > "${dir}/dummy")
 		done
             done
          done
