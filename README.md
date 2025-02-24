@@ -2,14 +2,15 @@
 Simple bash script to manage a configurable multiarch and multirelease apt repository
 
 ### Fetures
+- Multi-component
 - Multiarch
 - Multi-release
-- APT repo irectory tree creation (--mkdirs flag)
+- APT repo directory tree creation (--mkdirs flag)
 - Config files for apt-ftparchive creation (--createconf flag)
-- Packages creation per release and arch
-- Release creation per release and arch
-- Release and InRelease signing
-- Pug gpg keyring exportation
+- Packages creation per release and arch (--rebuild)
+- Release creation per release and arch (--rebuild)
+- Release and InRelease signing (--rebuild)
+- Pub gpg keyring exportation (--rebuild)
 - Repo sources.list creation
 - After generating a new dir tree and createconfig,  run with --rebuild to regenerate all
 - After adding new packages to any pool, run with --rebuild to regenerate all
