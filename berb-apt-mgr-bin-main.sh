@@ -427,8 +427,13 @@ fn_rebuild_repo() {
             ASK "Rescan and sign the repo? [ y|n ]: "
             [ "${answer}" != "y" ] && exit 10
         fi
-        ## Clean cache databases
-        rm -v cache/*/*
+        ## Clean cache databases in cache/release/component
+        rm -fv cache/*/*/packages-*.db
+        ## Clean dists dir files
+        rm -fv dists/*/InRelease
+        rm -fv dists/*/Release*
+        rm -fv dists/*/*/Contents-*.*
+        rm -fv dists/*/*/*/Packages.*
         ## Rebuild apt repo
         fn_gen_Packages
         fn_gen_Release
