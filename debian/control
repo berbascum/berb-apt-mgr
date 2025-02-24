@@ -1,0 +1,20 @@
+Source: berb-apt-mgr
+Maintainer: berbascum
+Section: utils
+Priority: optional
+Build-Depends: debhelper (>= 10),
+               debhelper-compat (= 13),
+Standards-Version: 4.5.0.3
+
+Package: berb-apt-mgr
+Architecture: all
+Depends: ${misc:Depends},
+	 wget,
+         git,
+         curl,
+         apt-utils,
+         dpkg-dev,
+         gnupg,
+         bbl-general-lib (>= 1.1.0.1),
+         bbl-git-lib (>= 1.2.3.1),
+Description: Bash script to manage a local apt repo

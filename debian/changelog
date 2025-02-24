@@ -1,0 +1,23 @@
+berb-apt-mgr (2.0.9.4+git20250103025749.d284a13.stable) stable; urgency=medium
+
+  [berbascum]
+  * (d284a13) (gitignore) skip: bdm-build.conf 
+  * (6c667c5) (pkg_rootfs) upgrade: dir upgrade to the latest changes 
+  * (9edd53a) (tools) script: new: for update the baptm files on the pkg_rootfs 
+  * (c22acb9) Increase version strings 
+  * (de2aa4b) (depends) bbl-git: bump to 1231 
+  * (ee8dad3) Build release: pre-configs before building new version 2.0.9.3-stable 
+  * (8954134) (pkg_rootfs) upgrade: dir upgrade to last changes 
+  * (ff85fe8) (script) main: clear unused var 
+  * (dd96048) (script) main: automate the gpg key passphrase for the github actions 
+  * (98c8963) (script) main: remove some temporal debug code 
+  * (6135bbb) (script) main: improve extra flags conditions in fn_rebuild_repo to avoid github action errors 
+  * (e5270ad) (script) main: enable debug on gpg commands on fn_sign_Release 
+  * (01b16c2) (script) main: add set -x at fn_sign_Release start 
+  * (a260379) (script) main: split the gpg pubkey export to a new function and call if --pubkey-export flag is used 
+  * (1047d2b) (script) main: add --passphrase option to the gpg ging Release commands using the github secret var 
+  * (ebf4cac) (script) main: rename GPG_KEY_ID var name to lowercase 
+  * (28035aa) (script) main: add sign Release related debug 
+  * (b14a959) (script) main: remmove condition when fn_get_gpg_keyid call 
+
+ -- berbascum <berbascum@ticv.cat>  Fri, 03 Jan 2025 02:57:49 +0100

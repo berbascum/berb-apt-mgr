@@ -1,0 +1,1 @@
+deb [arch=REPLACE_ARCHS signed-by=/usr/share/keyrings/REPLACE_FILENAME.gpg] REPLACE_URL stable main
