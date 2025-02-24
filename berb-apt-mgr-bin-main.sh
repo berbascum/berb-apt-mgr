@@ -173,7 +173,7 @@ fn_conf_filenames_set() {
 	    "${aptgen_conf_file}"| awk -F'.' '{print $1}')
         file_ext=$(echo \
 	    "${aptgen_conf_file}"| awk -F'.' '{print $2}')
-        aptgen_conf_full_filename="${file_base}-${release}.${file_ext}"
+        aptgen_conf_full_filename="${file_base}-${release}-${component}.${file_ext}"
 	## Set aptftp conf file
 	file_base=$(echo \
 	    "${aptftp_conf_file}"| awk -F'.' '{print $1}')
@@ -182,7 +182,7 @@ fn_conf_filenames_set() {
         aptftp_conf_full_filename="${file_base}-${release}.${file_ext}"
 }
 
-fn_get_arch_lists() {
+fn_get_archs_list() {
     ## Set needed vars
     architectures_archs_list=""
     apt_list_archs_list=""
@@ -201,6 +201,25 @@ fn_get_arch_lists() {
     #echo "architectures_archs_list=${architectures_archs_list}"
     #echo "apt_list_archs_list=${apt_list_archs_list}"
 }
+
+fn_get_components_list() {
+    ## Set needed vars
+    apt_components_space_list=""
+    apt_list_archs_comma_list=""
+    for component in ${arr_components[@]}; do
+	if [ -z "${apt_components_space_list}" ]; then
+            apt_components_space_list="\"${arch}\""
+        else
+            apt_components_space_list="${apt_components_space_list} \"${component}\""
+	fi
+	if [ -z "${apt_components_comma_list}" ]; then
+            apt_components_comma_list="${component}"
+        else
+            apt_components_comma_list="${apt_components_comma_list},${component}"
+	fi
+    done
+}
+
 fn_apt_repo_configs_create() {
     ## Ask for dirs creation
     ASK "Want to call the --mkdirs flag? [ y|n ]: "
@@ -215,58 +234,68 @@ fn_apt_repo_configs_create() {
         mkdir -p -v "${apt_conf_dir}"/fragments
     fi
     #
-    fn_get_arch_lists
+    fn_get_archs_list
+    fn_get_components_list
     #
     for release in ${arr_releases[@]}; do
-	## Set per release apt conf files
-	fn_conf_filenames_set
-        ## Create the aptgenerate global shared config
-        ## conf file from template, one file per release
-        cp -v "${aptgen_templ_file}" \
-	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
-        sed -i "s/REPLACE_TOOL_VERSION/${TOOL_VERSION}/g" \
-	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
-        sed -i "s/REPLACE_TOOL_RELEASE/${TOOL_RELEASE}/g" \
-	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
-        sed -i "s/REPLACE_RELEASE/${release}/g" \
-	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
-
-        ## Create aptconf BinDir fragments
-	## and merge in aptgenerate.conf
-        for arch in ${arr_archs[@]}; do
-	    aptconf_BinDir_frag="${apt_conf_dir}/fragments/aptconf-BinDir-${release}-${arch}.fragment"
-            cp -v "${aptconf_BinDir_templ_file}" \
-		"${aptconf_BinDir_frag}"
+        for component in ${arr_components[@]}; do
+	    ## Set per release and per component apt conf files
+	    fn_conf_filenames_set
+            ## Create the aptgenerate global shared config
+            ## conf file from template, one file per release
+            cp -v "${aptgen_templ_file}" \
+	        "${apt_conf_dir}/${aptgen_conf_full_filename}"
+            sed -i "s/REPLACE_TOOL_VERSION/${TOOL_VERSION}/g" \
+	        "${apt_conf_dir}/${aptgen_conf_full_filename}"
+            sed -i "s/REPLACE_TOOL_RELEASE/${TOOL_RELEASE}/g" \
+	        "${apt_conf_dir}/${aptgen_conf_full_filename}"
             sed -i "s/REPLACE_RELEASE/${release}/g" \
+	        "${apt_conf_dir}/${aptgen_conf_full_filename}"
+            sed -i "s/REPLACE_COMPONENT/${component}/g" \
+	        "${apt_conf_dir}/${aptgen_conf_full_filename}"
+            ## Create aptconf BinDir fragments
+	    ## and merge in aptgenerate.conf
+            for arch in ${arr_archs[@]}; do
+	        aptconf_BinDir_frag="${apt_conf_dir}/fragments/aptconf-BinDir-${release}-${component}-${arch}.fragment"
+                cp -v "${aptconf_BinDir_templ_file}" \
 		"${aptconf_BinDir_frag}"
-            sed -i "s/REPLACE_ARCH/${arch}/g" \
-		"${aptconf_BinDir_frag}"
-            cat "${aptconf_BinDir_frag}" >> \
-	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
-        done
-        ## Create aptconf SrcDir fragments
-	## and merge in aptgenerate.conf
-	aptconf_SrcDir_frag="${apt_conf_dir}/fragments/aptconf-SrcDir-${release}.fragment"
-        cp -v "${aptconf_SrcDir_templ_file}" \
-	    "${aptconf_SrcDir_frag}"
-        sed -i "s/REPLACE_RELEASE/${release}/g" \
-	    "${aptconf_SrcDir_frag}"
-        cat "${aptconf_SrcDir_frag}" >> \
-	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
-        ## Create aptconf Tree fragments
-	## and merge in aptgenerate.conf
-	aptconf_Tree_frag="${apt_conf_dir}/fragments/aptconf-Tree-${release}.fragment"
-        cp -v "${aptconf_Tree_templ_file}" \
-	    "${aptconf_Tree_frag}"
-        sed -i "s/REPLACE_RELEASE/${release}/g" \
-	    "${aptconf_Tree_frag}"
-        sed -i "s/replace_archs_list/${architectures_archs_list}/g" \
-	    "${aptconf_Tree_frag}"
-        cat "${aptconf_Tree_frag}" >> \
-	    "${apt_conf_dir}/${aptgen_conf_full_filename}"
+                sed -i "s/REPLACE_RELEASE/${release}/g" \
+		    "${aptconf_BinDir_frag}"
+                sed -i "s/REPLACE_ARCH/${arch}/g" \
+		    "${aptconf_BinDir_frag}"
+                sed -i "s/REPLACE_COMPONENT/${component}/g" \
+		    "${aptconf_BinDir_frag}"
+                cat "${aptconf_BinDir_frag}" >> \
+	            "${apt_conf_dir}/${aptgen_conf_full_filename}"
+            done
+            ## Create aptconf SrcDir fragments
+	    ## and merge in aptgenerate.conf
+	    aptconf_SrcDir_frag="${apt_conf_dir}/fragments/aptconf-SrcDir-${release}-${component}.fragment"
+            cp -v "${aptconf_SrcDir_templ_file}" \
+	        "${aptconf_SrcDir_frag}"
+            sed -i "s/REPLACE_RELEASE/${release}/g" \
+	        "${aptconf_SrcDir_frag}"
+            sed -i "s/REPLACE_COMPONENT/${component}/g" \
+	        "${aptconf_SrcDir_frag}"
+            cat "${aptconf_SrcDir_frag}" >> \
+	        "${apt_conf_dir}/${aptgen_conf_full_filename}"
+            ## Create aptconf Tree fragments
+	    ## and merge in aptgenerate.conf
+	    aptconf_Tree_frag="${apt_conf_dir}/fragments/aptconf-Tree-${release}-${component}.fragment"
+            cp -v "${aptconf_Tree_templ_file}" \
+	        "${aptconf_Tree_frag}"
+            sed -i "s/REPLACE_RELEASE/${release}/g" \
+	        "${aptconf_Tree_frag}"
+            sed -i "s/replace_archs_list/${architectures_archs_list}/g" \
+	        "${aptconf_Tree_frag}"
+            sed -i "s/REPLACE_COMPONENT/${component}/g" \
+	        "${aptconf_Tree_frag}"
+            cat "${aptconf_Tree_frag}" >> \
+	        "${apt_conf_dir}/${aptgen_conf_full_filename}"
+	done ## Components
         #
         ## Create the base aptftp config from template
-        ## one per release
+        ## one per release and component
         cp -v "${aptftp_templ_file}" \
 	    "${apt_conf_dir}/${aptftp_conf_full_filename}"
         sed -i "s/REPLACE_TOOL_VERSION/${TOOL_VERSION}/g" \
@@ -285,7 +314,10 @@ fn_apt_repo_configs_create() {
         sed -i \
 	    "s/replace_archs_list/${architectures_archs_list}/g" \
 	    "${apt_conf_dir}/${aptftp_conf_full_filename}"
-    done
+        sed -i \
+	    "s/replace_components_list/${apt_components_space_list}/g" \
+	    "${apt_conf_dir}/${aptftp_conf_full_filename}"
+    done ## Releases
     ## Create the apt list from template
     if [ ! -f "${gpg_pub_filename}.list" ]; then
 	info "Creating \"${gpg_pub_filename}.list\"..."
