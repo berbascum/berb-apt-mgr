@@ -341,13 +341,15 @@ fn_gen_Packages() {
     ## First copy the debs to pool/<release>/main/binary-<arch>
     #
     for release in ${arr_releases[@]}; do
-        ## Set per release apt conf files
-        fn_conf_filenames_set
-        ## Create Packages and Content
-	info "Generating \"Packages\" for \"${release}\"..."
-        apt-ftparchive generate \
-	 -c=${apt_conf_dir}/${aptftp_conf_full_filename} \
-	    ${apt_conf_dir}/${aptgen_conf_full_filename}
+	for component in ${arr_components[@]}; do
+	    ## Set per release and component apt conf files
+	    fn_conf_filenames_set
+	    ## Create Packages and Content
+	    info "Generating \"Packages\" for \"${release}\" and component \"${component}\"..."
+	    apt-ftparchive generate \
+	        -c=${apt_conf_dir}/${aptftp_conf_full_filename} \
+	        ${apt_conf_dir}/${aptgen_conf_full_filename}
+	done
     done
 }
 
