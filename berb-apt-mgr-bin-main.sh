@@ -184,22 +184,22 @@ fn_conf_filenames_set() {
 
 fn_get_archs_list() {
     ## Set needed vars
-    architectures_archs_list=""
-    apt_list_archs_list=""
+    apt_archs_space_list=""
+    apt_archs_comma_list=""
     for arch in ${arr_archs[@]}; do
-	if [ -z "${architectures_archs_list}" ]; then
-            architectures_archs_list="\"${arch}\""
+	if [ -z "${apt_archs_space_list}" ]; then
+            apt_archs_space_list="\"${arch}\""
         else
-            architectures_archs_list="${architectures_archs_list} \"${arch}\""
+            apt_archs_space_list="${apt_archs_space_list} \"${arch}\""
 	fi
-	if [ -z "${apt_list_archs_list}" ]; then
-            apt_list_archs_list="${arch}"
+	if [ -z "${apt_archs_comma_list}" ]; then
+            apt_archs_comma_list="${arch}"
         else
-            apt_list_archs_list="${apt_list_archs_list},${arch}"
+            apt_archs_comma_list="${apt_archs_comma_list},${arch}"
 	fi
     done
-    #echo "architectures_archs_list=${architectures_archs_list}"
-    #echo "apt_list_archs_list=${apt_list_archs_list}"
+    #echo "apt_archs_space_list=${apt_archs_space_list}"
+    #echo "apt_archs_comma_list=${apt_archs_comma_list}"
 }
 
 fn_get_components_list() {
@@ -286,7 +286,7 @@ fn_apt_repo_configs_create() {
 	        "${aptconf_Tree_frag}"
             sed -i "s/REPLACE_RELEASE/${release}/g" \
 	        "${aptconf_Tree_frag}"
-            sed -i "s/replace_archs_list/${architectures_archs_list}/g" \
+            sed -i "s/replace_archs_list/${apt_archs_space_list}/g" \
 	        "${aptconf_Tree_frag}"
             sed -i "s/REPLACE_COMPONENT/${component}/g" \
 	        "${aptconf_Tree_frag}"
@@ -312,7 +312,7 @@ fn_apt_repo_configs_create() {
 	    "s/REPLACE_DESC/${releases_description}/g" \
 	    "${apt_conf_dir}/${aptftp_conf_full_filename}"
         sed -i \
-	    "s/replace_archs_list/${architectures_archs_list}/g" \
+	    "s/replace_archs_list/${apt_archs_space_list}/g" \
 	    "${apt_conf_dir}/${aptftp_conf_full_filename}"
         sed -i \
 	    "s/replace_components_list/${apt_components_space_list}/g" \
@@ -323,7 +323,7 @@ fn_apt_repo_configs_create() {
 	info "Creating \"${gpg_pub_filename}.list\"..."
         cp "${apt_template_list_fullpath_filename}" \
 	    "${gpg_pub_filename}.list"
-        sed -i "s/REPLACE_ARCHS/${apt_list_archs_list}/g" \
+        sed -i "s/REPLACE_ARCHS/${apt_archs_comma_list}/g" \
 	    "${gpg_pub_filename}.list"
         sed -i "s/REPLACE_FILENAME/${gpg_pub_filename}/g" \
 	    "${gpg_pub_filename}.list"
