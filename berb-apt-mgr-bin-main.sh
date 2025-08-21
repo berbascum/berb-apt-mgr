@@ -28,7 +28,7 @@ fn_header_info() {
 TOOL_NAME="berb-apt-mgr"
 TOOL_VERSION="2.1.0.1"
 TOOL_RELEASE="stable"
-BBL_GENERAL_VERSION="1101"
+bbl_general_version="1111"
 BBL_NET_VERSION="1001"
 BBL_GIT_VERSION="1231"
 #[HEADER_END]
@@ -90,7 +90,11 @@ fn_get_gpg_keyid() {
 
 fn_bam_global_conf() {
     ## Load libs
-    source /usr/lib/berb-bash-libs/bbl_general_lib_${BBL_GENERAL_VERSION}
+    . /usr/lib/berb-bash-libs/bbl_general_lib_${bbl_general_version} verbose
+    . /usr/lib/berb-bash-libs/bbl_general_lib_${bbl_general_version} script-args
+    . /usr/lib/berb-bash-libs/bbl_general_lib_${bbl_general_version} environment
+    . /usr/lib/berb-bash-libs/bbl_general_lib_${bbl_general_version} conf-files
+
     source /usr/lib/berb-bash-libs/bbl_git_lib_${BBL_GIT_VERSION}
     #source /usr/lib/berb-bash-libs/bbl_net_lib_${BBL_NET_VERSION}
     ## Config log
