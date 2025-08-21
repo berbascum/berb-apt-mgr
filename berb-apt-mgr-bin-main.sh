@@ -177,6 +177,16 @@ fn_mkdirs() {
 }
 [ -n "$(echo "$@" | grep "\-\-mkdirs")" ] && fn_mkdirs && exit 0
 
+fn_clean_dists_cache() {
+        ## Clean cache databases in cache/release/component
+        rm -fv cache/*/*/packages-*.db
+        ## Clean dists dir files
+        rm -fv dists/*/InRelease
+        rm -fv dists/*/Release*
+        rm -fv dists/*/*/Contents-*.*
+        rm -fv dists/*/*/*/Packages.*
+}
+
 fn_conf_filenames_set() {
 	## Set aptgen conf file
         file_base=$(echo \
@@ -430,19 +440,13 @@ fn_gpg_pubkey_export() {
 }
 
 fn_rebuild_repo() {
+    ## Rebuild apt repo
     if [ -d "pool" ]; then
         if [ "${BATCH_MODE}" != "True" ]; then
-            ASK "Rescan the repo? [ y|n ]: "
+            ASK "CLEAN DISTS CACHE before rebuild? [ y|n ]: "
             [ "${answer}" != "y" ] && exit 10
         fi
-        ## Clean cache databases in cache/release/component
-        rm -fv cache/*/*/packages-*.db
-        ## Clean dists dir files
-        rm -fv dists/*/InRelease
-        rm -fv dists/*/Release*
-        rm -fv dists/*/*/Contents-*.*
-        rm -fv dists/*/*/*/Packages.*
-        ## Rebuild apt repo
+        fn_clean_dists_cache
         fn_gen_Packages
         fn_gen_Release
         if [ "${BATCH_MODE}" != "True" ]; then
