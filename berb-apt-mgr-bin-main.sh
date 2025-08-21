@@ -432,7 +432,7 @@ fn_gpg_pubkey_export() {
 fn_rebuild_repo() {
     if [ -d "pool" ]; then
         if [ "${BATCH_MODE}" != "True" ]; then
-            ASK "Rescan and sign the repo? [ y|n ]: "
+            ASK "Rescan the repo? [ y|n ]: "
             [ "${answer}" != "y" ] && exit 10
         fi
         ## Clean cache databases in cache/release/component
@@ -445,6 +445,10 @@ fn_rebuild_repo() {
         ## Rebuild apt repo
         fn_gen_Packages
         fn_gen_Release
+        if [ "${BATCH_MODE}" != "True" ]; then
+            ASK "Sign the repo? [ y|n ]: "
+            [ "${answer}" != "y" ] && exit 10
+        fi
         fn_sign_Release
         [ -z "$(echo "$@" | grep "\-\-pubkey-export")" ] || fn_gpg_pubkey_export
         [ -z "$(echo "$@" | grep "\-\-commit")" ] || fn_commit_changes
