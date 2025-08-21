@@ -16,5 +16,5 @@ Depends: ${misc:Depends},
          dpkg-dev,
          gnupg,
          bbl-general-lib (>= 1.1.1.1),
-         bbl-git-lib (>= 1.2.3.1),
+         bbl-git-lib (>= 1.3.1.1),
 Description: Bash script to manage a local apt repo

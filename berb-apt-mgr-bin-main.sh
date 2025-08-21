@@ -30,7 +30,7 @@ TOOL_VERSION="2.1.0.1"
 TOOL_RELEASE="stable"
 bbl_general_version="1111"
 BBL_NET_VERSION="1001"
-BBL_GIT_VERSION="1231"
+bbl_git_version="1311"
 #[HEADER_END]
 
 ## Args
@@ -95,7 +95,7 @@ fn_bam_global_conf() {
     . /usr/lib/berb-bash-libs/bbl_general_lib_${bbl_general_version} environment
     . /usr/lib/berb-bash-libs/bbl_general_lib_${bbl_general_version} conf-files
 
-    source /usr/lib/berb-bash-libs/bbl_git_lib_${BBL_GIT_VERSION}
+    source /usr/lib/berb-bash-libs/bbl_git_lib_${bbl_git_version}
     #source /usr/lib/berb-bash-libs/bbl_net_lib_${BBL_NET_VERSION}
     ## Config log
     fn_bbgl_config_log
