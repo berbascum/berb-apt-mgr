@@ -26,7 +26,7 @@ fn_header_info() {
     TESTED_BASH_VER='5.2.15'
 }
 TOOL_NAME="berb-apt-mgr"
-TOOL_VERSION="2.1.1.1"
+TOOL_VERSION="2.1.1.2"
 TOOL_RELEASE="stable"
 bbl_general_version="1111"
 BBL_NET_VERSION="1001"
