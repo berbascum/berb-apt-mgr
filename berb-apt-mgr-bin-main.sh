@@ -28,7 +28,7 @@ fn_header_info() {
 TOOL_NAME="berb-apt-mgr"
 TOOL_VERSION="2.1.1.2"
 TOOL_RELEASE="stable"
-bbl_general_version="1111"
+bbl_general_version="1121"
 BBL_NET_VERSION="1001"
 bbl_git_version="1311"
 #[HEADER_END]
@@ -90,13 +90,24 @@ fn_get_gpg_keyid() {
 
 fn_bam_global_conf() {
     ## Load libs
-    . /usr/lib/berb-bash-libs/bbl_general_lib_${bbl_general_version} verbose
-    . /usr/lib/berb-bash-libs/bbl_general_lib_${bbl_general_version} script-args
-    . /usr/lib/berb-bash-libs/bbl_general_lib_${bbl_general_version} environment
-    . /usr/lib/berb-bash-libs/bbl_general_lib_${bbl_general_version} conf-files
+    . /usr/lib/berb-bash-libs/bbl_general_lib_main_${bbl_general_version} verbose
+    . /usr/lib/berb-bash-libs/bbl_general_lib_main_${bbl_general_version} script-args
+    . /usr/lib/berb-bash-libs/bbl_general_lib_main_${bbl_general_version} environment
+    . /usr/lib/berb-bash-libs/bbl_general_lib_main_${bbl_general_version} conf-files
+    BBL_GENERAL_SOURCED="yes"
 
-    source /usr/lib/berb-bash-libs/bbl_git_lib_${bbl_git_version}
+    source /usr/lib/berb-bash-libs/bbl_git_lib_main_${bbl_git_version}
     #source /usr/lib/berb-bash-libs/bbl_net_lib_${BBL_NET_VERSION}
+    LOG_FULLPATH="${HOME}/logs/${TOOL_NAME}"
+    ## Config log level
+    FLAG_TYPE="value"
+    fn_bbgl_config_log_level $@
+    ## Config log
+    FLAG_TYPE="empty"
+    fn_bbgl_config_log $@
+    ## Search for the --help$ flag in the arguments
+    FLAG_TYPE="empty"
+    fn_bbgl_help_check_flag $@
     ## Config log
     fn_bbgl_config_log
     ## Config log level
