@@ -26,11 +26,11 @@ fn_header_info() {
     TESTED_BASH_VER='5.2.15'
 }
 TOOL_NAME="berb-apt-mgr"
-TOOL_VERSION="2.1.0.1"
+TOOL_VERSION="2.1.1.2"
 TOOL_RELEASE="stable"
-BBL_GENERAL_VERSION="1101"
+bbl_general_version="1121"
 BBL_NET_VERSION="1001"
-BBL_GIT_VERSION="1231"
+bbl_git_version="1311"
 #[HEADER_END]
 
 ## Args
@@ -90,9 +90,24 @@ fn_get_gpg_keyid() {
 
 fn_bam_global_conf() {
     ## Load libs
-    source /usr/lib/berb-bash-libs/bbl_general_lib_${BBL_GENERAL_VERSION}
-    source /usr/lib/berb-bash-libs/bbl_git_lib_${BBL_GIT_VERSION}
+    . /usr/lib/berb-bash-libs/bbl_general_lib_main_${bbl_general_version} verbose
+    . /usr/lib/berb-bash-libs/bbl_general_lib_main_${bbl_general_version} script-args
+    . /usr/lib/berb-bash-libs/bbl_general_lib_main_${bbl_general_version} environment
+    . /usr/lib/berb-bash-libs/bbl_general_lib_main_${bbl_general_version} conf-files
+    BBL_GENERAL_SOURCED="yes"
+
+    source /usr/lib/berb-bash-libs/bbl_git_lib_main_${bbl_git_version}
     #source /usr/lib/berb-bash-libs/bbl_net_lib_${BBL_NET_VERSION}
+    LOG_FULLPATH="${HOME}/logs/${TOOL_NAME}"
+    ## Config log level
+    FLAG_TYPE="value"
+    fn_bbgl_config_log_level $@
+    ## Config log
+    FLAG_TYPE="empty"
+    fn_bbgl_config_log $@
+    ## Search for the --help$ flag in the arguments
+    FLAG_TYPE="empty"
+    fn_bbgl_help_check_flag $@
     ## Config log
     fn_bbgl_config_log
     ## Config log level
@@ -172,6 +187,16 @@ fn_mkdirs() {
     done
 }
 [ -n "$(echo "$@" | grep "\-\-mkdirs")" ] && fn_mkdirs && exit 0
+
+fn_clean_dists_cache() {
+        ## Clean cache databases in cache/release/component
+        rm -fv cache/*/*/packages-*.db
+        ## Clean dists dir files
+        rm -fv dists/*/InRelease
+        rm -fv dists/*/Release*
+        rm -fv dists/*/*/Contents-*.*
+        rm -fv dists/*/*/*/Packages.*
+}
 
 fn_conf_filenames_set() {
 	## Set aptgen conf file
@@ -426,21 +451,19 @@ fn_gpg_pubkey_export() {
 }
 
 fn_rebuild_repo() {
+    ## Rebuild apt repo
     if [ -d "pool" ]; then
         if [ "${BATCH_MODE}" != "True" ]; then
-            ASK "Rescan and sign the repo? [ y|n ]: "
+            ASK "CLEAN DISTS CACHE before rebuild? [ y|n ]: "
             [ "${answer}" != "y" ] && exit 10
         fi
-        ## Clean cache databases in cache/release/component
-        rm -fv cache/*/*/packages-*.db
-        ## Clean dists dir files
-        rm -fv dists/*/InRelease
-        rm -fv dists/*/Release*
-        rm -fv dists/*/*/Contents-*.*
-        rm -fv dists/*/*/*/Packages.*
-        ## Rebuild apt repo
+        fn_clean_dists_cache
         fn_gen_Packages
         fn_gen_Release
+        if [ "${BATCH_MODE}" != "True" ]; then
+            ASK "Sign the repo? [ y|n ]: "
+            [ "${answer}" != "y" ] && exit 10
+        fi
         fn_sign_Release
         [ -z "$(echo "$@" | grep "\-\-pubkey-export")" ] || fn_gpg_pubkey_export
         [ -z "$(echo "$@" | grep "\-\-commit")" ] || fn_commit_changes
