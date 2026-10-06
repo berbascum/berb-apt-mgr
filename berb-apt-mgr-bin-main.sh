@@ -26,7 +26,6 @@ TOOL_VERSION="2.1.1.3"
 TOOL_RELEASE="stable"
 bbl_general_version="1121"
 BBL_NET_VERSION="1001"
-bbl_git_version="1311"
 #[HEADER_END]
 
 ## Args
@@ -92,7 +91,6 @@ fn_bam_global_conf() {
     . /usr/lib/berb-bash-libs/bbl_general_lib_main_${bbl_general_version} conf-files
     BBL_GENERAL_SOURCED="yes"
 
-    source /usr/lib/berb-bash-libs/bbl_git_lib_main_${bbl_git_version}
     #source /usr/lib/berb-bash-libs/bbl_net_lib_${BBL_NET_VERSION}
     LOG_FULLPATH="${HOME}/logs/${TOOL_NAME}"
     ## Config log level
@@ -413,6 +411,16 @@ fn_sign_Release() {
     ## --list-keys --keyid-format long near 
 }
 
+fn_set_git_commit_cmd() {
+    git_key_found="$(gpg --list-keys --keyid-format LONG | grep $(git config --global user.signingkey))"
+
+    if [ -n "${git_key_found}" ]; then
+        GIT_COMMIT_CMD='git commit -S -m "${commit_msg}"'
+    else
+        GIT_COMMIT_CMD='git commit -m "${commit_msg}"'
+    fi
+}
+
 fn_commit_changes() {
 	#
         ## Default commit msg used for --batch mode
@@ -428,8 +436,8 @@ fn_commit_changes() {
                 && commit_msg="${commit_msg}: ${answer}"
         fi
         ## Add and commit
-	git add cache dists
-        fn_bblgit_check_if_can_sign
+        git add cache dists
+        fn_set_git_commit_cmd
         eval "${GIT_COMMIT_CMD}"
         ## Interactive mode:
         if [ "${BATCH_MODE}" != "True" ]; then
