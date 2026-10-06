@@ -49,3 +49,6 @@ repo_path/berb-apt-mgr.conf
   --rebuild:    Rebuilds the repository metadata
 
   --createconf: Generates the aptftp.conf and aptgenerate.conf files from templates using the suites, components and archs configured in the berb-apt-mgr.conf file
+
+## Acknowledgements
+Thanks to vacuumbeef for sharing the aptfp commands to create and sign an APT repository on which I have based this script.

@@ -3,12 +3,12 @@ Upstream-Name: berb-apt-mgr
 Source: https://github.com/berbascum/berb-apt-mgr
 
 Files: *
-Copyright: 2022 berbascum <berbascum@ticv.cat>
+Copyright: 2024 berbascum <berbascum@ticv.cat>
 License: BSD-3-clause
 
 Files: debian/*
 Copyright: 2024 berbascum <berbascum@ticv.cat>
-License: BSD-3-clause
+License: GPL-3+
 
 License: BSD-3-clause
  Redistribution and use in source and binary forms, with or without
@@ -32,3 +32,20 @@ License: BSD-3-clause
  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+License: GPL-3.0+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ .
+ On Debian systems, the full text of the GNU General Public License
+ version 3 can be found in the file `/usr/share/common-licenses/GPL-3'.

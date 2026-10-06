@@ -1,16 +1,12 @@
 #!/bin/bash
 
-## Script to manage a multiarch apt repository
+## Script to manage an apt repository
 #
-## Thanks to vacuumbeef <vacuumbeef@vacuumbeef> who was shared to me the 
-## procedure to create and sign the repo base structure
-#
-# Upstream-Name: berb-apt-mgr
-#  Source: https://gitlab.com/berbascum/berb-apt-mgr
-#
-# Copyright (C) 2024 Berbascum <berbascum@ticv.cat>
-# All rights reserved.
-# BSD 3-Clause License
+# Upstream-Name: apt-berb-mgr
+# Copyright: (c) 2024, berbascum <berbascum@ticv.cat>
+# License: BSD-3-Clause
+# https://github.com/berbascum/berb-apt-mgr/blob/main/LICENSE
+
 
 #################
 ## Header vars ##
